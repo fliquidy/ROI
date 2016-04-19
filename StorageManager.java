@@ -9,13 +9,16 @@ import org.mapdb.*;
 
 public class StorageManager {
 	static DB db = DBMaker.newFileDB(new File("roi")).closeOnJvmShutdown().make();
+	double a;
+	double b;
+	
+	//memory
 	public HashSet<Cell> cellsInMem;
 	public HashMap<Cell, Vector<SpatialObject>> exactIndex;
 	public HashMap<Cell, Double> ubInCache;
 	public Vector<SpatialObject> cache;
 	double upperBoundInRestCells;
-	double a;
-	double b;
+	
 	public StorageManager(Type t){
 		db.createTreeMap("detail").makeOrGet();//store details of spatial objects
 		if(t == Type.Exact){
@@ -32,6 +35,7 @@ public class StorageManager {
 		}
 		
 	}
+	
 	public void writeDetails(SpatialObject o){
 		BTreeMap<Integer, SpatialObject> map = db.createTreeMap("details").makeOrGet();
 		map.put(o._id, o);
@@ -42,6 +46,11 @@ public class StorageManager {
 			Cell c = o.locateCell(a, b);
 			if(cellsInMem.contains(c)){
 				//maintain in memory
+				//1. Update upper bound, maintain memory index 
+				//2. If new upper bound > current optimal result, find exact result
+				if(o._y + this.b){
+					
+				}
 			}
 			else{
 				//maintain in disk

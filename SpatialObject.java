@@ -7,14 +7,16 @@ public class SpatialObject {
 	public int _time;
 	public double _x;
 	public double _y;
+	public double _weight;
 	public Vector<Integer> attributes;
 	
-	public SpatialObject(int id, int date, int time, double x, double y){
+	public SpatialObject(int id, int date, int time, double x, double y, double weight){
 		this._id = id;
 		this._date = date;
 		this._time = time;
 		this._x = x;
 		this._y = y;
+		this._weight = weight;
 		attributes = new Vector<Integer>();
 	}
 	
