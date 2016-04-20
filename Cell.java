@@ -4,6 +4,14 @@ import java.util.Objects;
 public class Cell {
 	public int _x;
 	public int _y;
+	public Cell(Cell c){
+		this._x = c._x;
+		this._y = c._y;
+	}
+	public Cell(int x, int y){
+		this._x = x;
+		this._y = y;
+	}
 	public Cell(double x, double y, double a, double b){
 		_x = (int)(x/b);
 		_y = (int)(y/a);
@@ -17,6 +25,19 @@ public class Cell {
 	}
 	public int hashCode(){
 		return Objects.hash(_x, _y);
+	}
+	public void clone(Cell c){
+		this._x = c._x;
+		this._y = c._y;
+	}
+	public Cell up(){
+		return new Cell(this._x, this._y+1);
+	}
+	public Cell right(){
+		return new Cell(this._x+1, this._y);
+	}
+	public Cell upright(){
+		return new Cell(this._x+1, this._y+1);
 	}
 	
 }

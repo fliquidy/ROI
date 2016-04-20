@@ -1,5 +1,6 @@
 package ROI;
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
@@ -17,15 +18,24 @@ public class StorageManager {
 	public HashMap<Cell, Vector<SpatialObject>> exactIndex;
 	public HashMap<Cell, Double> ubInCache;
 	public Vector<SpatialObject> cache;
-	double upperBoundInRestCells;
+	public Vector<CellUB> upperBoundInRestCells;
+
 	
-	public StorageManager(Type t){
+	//config
+	Config _config;
+	
+	public StorageManager(Type t, Config config){
+		_config = new Config(config);
+		
+		
 		db.createTreeMap("detail").makeOrGet();//store details of spatial objects
+		
 		if(t == Type.Exact){
 			cellsInMem = new HashSet<Cell>();
 			exactIndex = new HashMap<Cell, Vector<SpatialObject>>();
 			ubInCache = new HashMap<Cell, Double>();
 			cache = new Vector<SpatialObject>();
+			upperBoundInRestCells = new Vector<CellUB>();
 		}
 		else if(t == Type.GB){
 			
@@ -35,6 +45,36 @@ public class StorageManager {
 		}
 		
 	}
+	public void update(SpatialObject o){
+		/*
+		 * When a new spatial object arrives, it affects cell c1-c4. 
+		 * We write it to cache, then we consider the following cases:
+		 * 1. c is in memory: update UB, find exact answer if necessary
+		 * 2. c is in disk: update UBRest, update UBs in rest cells if necessary
+		 */
+	}
+	
+	
+	
+	public void maintainMemIndex(Cell c, SpatialObject o){
+		//process the case when the affected cell is in memory
+	}
+	public void maintainDiskIndex(Cell c, SpatialObject o){
+		//process the case when the affected cell is in disk
+	}
+	public void writeToCache(SpatialObject o, Type t){
+		/*
+		 *We maintain recent objects in memory to reduce IO cost.
+		 * Only the objects that are not in memory are stored in cache
+		 */
+		cache.addElement(o);
+		if(cache.size() > _config.cacheSize){
+			for(SpatialObject sp : cache){
+				
+			}
+		}
+	}
+	
 	
 	public void writeDetails(SpatialObject o){
 		BTreeMap<Integer, SpatialObject> map = db.createTreeMap("details").makeOrGet();
@@ -44,26 +84,57 @@ public class StorageManager {
 		if(t == Type.Exact){
 			BTreeMap<Cell, Vector<Integer>> index = db.createTreeMap("ExactIndex").makeOrGet();
 			Cell c = o.locateCell(a, b);
+			Cell cu = c.up();
+			Cell cr = c.right();
+			Cell cur = c.upright();
 			if(cellsInMem.contains(c)){
-				//maintain in memory
-				//1. Update upper bound, maintain memory index 
-				//2. If new upper bound > current optimal result, find exact result
-				if(o._y + this.b){
-					
-				}
+				maintainMemIndex(c, o);
 			}
 			else{
-				//maintain in disk
+				maintainDiskIndex(c, o);
+			}
+			if(cellsInMem.contains(cu)){
+				maintainMemIndex(cu, o);
+			}
+			else{
+				maintainDiskIndex(cu, o);
+			}
+			if(cellsInMem.contains(cr)){
+				maintainMemIndex(cr, o);
+			}
+			else{
+				maintainDiskIndex(cr, o);
+			}
+			if(cellsInMem.contains(cur)){
+				maintainMemIndex(cur, o);
+			}
+			else{
+				maintainDiskIndex(cur, o);
 			}
 		}
 	}
 	
-	public void writeToCache(SpatialObject o, Type t){
-		/*
-		 *We maintain recent objects in memory to reduce IO cost.
-		 * 
-		 */
+	public double updateUBInDisk(Cell c, SpatialObject o){
+		if(upperBoundInRestCells.size() < _config.ubInRestCellsCount){
+			upperBoundInRestCells.addElement(new CellUB(c, o._weight));
+		}
+		else{
+			for(CellUB cub : upperBoundInRestCells){
+				if(cub._cell.equals(c)){
+					cub._UB += o._weight;
+					Collections.sort(upperBoundInRestCells);
+					return upperBoundInRestCells.lastElement()._UB;
+				}
+			}
+			upperBoundInRestCells.elementAt(0)._cell.clone(c);
+			upperBoundInRestCells.elementAt(0)._UB += o._weight;
+			
+		}
+		Collections.sort(upperBoundInRestCells);
+		return upperBoundInRestCells.lastElement()._UB;
+		
 	}
+	
 	public void flush(){
 		/*
 		 * Write the spatial objects in cache into disk.
