@@ -13,12 +13,16 @@ public class StorageManager {
 	double a;
 	double b;
 	
+	public SpatialObject omax;
+	public double smax;
+	
 	//memory
 	public HashSet<Cell> cellsInMem;
 	public HashMap<Cell, Vector<SpatialObject>> exactIndex;
 	public HashMap<Cell, Double> ubInCache;
 	public Vector<SpatialObject> cache;
 	public Vector<CellUB> upperBoundInRestCells;
+	public Vector<CellUB> upperBoundInRestCellsBackup;
 
 	
 	//config
@@ -26,7 +30,7 @@ public class StorageManager {
 	
 	public StorageManager(Type t, Config config){
 		_config = new Config(config);
-		
+		smax = 0;
 		
 		db.createTreeMap("detail").makeOrGet();//store details of spatial objects
 		
@@ -36,6 +40,7 @@ public class StorageManager {
 			ubInCache = new HashMap<Cell, Double>();
 			cache = new Vector<SpatialObject>();
 			upperBoundInRestCells = new Vector<CellUB>();
+			upperBoundInRestCellsBackup = new Vector<CellUB>();
 		}
 		else if(t == Type.GB){
 			
@@ -68,7 +73,10 @@ public class StorageManager {
 		 * Only the objects that are not in memory are stored in cache
 		 */
 		cache.addElement(o);
-		if(cache.size() > _config.cacheSize){
+		Cell c = o.locateCell(a, b);
+		double ub = updateUBInDisk(c, o);
+		if(cache.size() > _config.cacheSize || ub > smax){
+			//write cache to disk
 			for(SpatialObject sp : cache){
 				
 			}
@@ -115,6 +123,7 @@ public class StorageManager {
 	}
 	
 	public double updateUBInDisk(Cell c, SpatialObject o){
+		//update the loose upper bound for the cells in disk
 		if(upperBoundInRestCells.size() < _config.ubInRestCellsCount){
 			upperBoundInRestCells.addElement(new CellUB(c, o._weight));
 		}
