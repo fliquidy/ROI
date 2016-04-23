@@ -20,6 +20,7 @@ public class StorageManager {
 	public HashSet<Cell> cellsInMem;
 	public HashMap<Cell, Vector<SpatialObject>> exactIndex;
 	public HashMap<Cell, Double> ubInCache;
+	public HashMap<Cell, Double> ubInMem;
 	public Vector<SpatialObject> cache;
 	public Vector<CellUB> upperBoundInRestCells;
 	public Vector<CellUB> upperBoundInRestCellsBackup;
@@ -38,6 +39,7 @@ public class StorageManager {
 			cellsInMem = new HashSet<Cell>();
 			exactIndex = new HashMap<Cell, Vector<SpatialObject>>();
 			ubInCache = new HashMap<Cell, Double>();
+			ubInMem = new HashMap<Cell, Double>();
 			cache = new Vector<SpatialObject>();
 			upperBoundInRestCells = new Vector<CellUB>();
 			upperBoundInRestCellsBackup = new Vector<CellUB>();
@@ -48,7 +50,9 @@ public class StorageManager {
 		else if(t == Type.OB){
 			
 		}
-		
+	}
+	public void updateResult(double x, double y){
+		System.out.println("Result updated: center "+x+"," + y);
 	}
 	public void update(SpatialObject o){
 		/*
@@ -63,9 +67,25 @@ public class StorageManager {
 	
 	public void maintainMemIndex(Cell c, SpatialObject o){
 		//process the case when the affected cell is in memory
+		exactIndex.get(c).add(o);
+		double old_ub = ubInMem.get(c);
+		if(old_ub + o._weight > smax){
+			//this cell may be a result, find the exact max score in this cell.
+			ExactSolver es = new ExactSolver();
+			double ub = es.find();
+			ubInMem.put(c, ub);
+			if(ub > smax){
+				updateResult(es.x, es.y);
+			}
+		}
+		else{
+			//this cell cannot be a result
+			ubInMem.put(c, old_ub + o._weight);
+		}
 	}
 	public void maintainDiskIndex(Cell c, SpatialObject o){
 		//process the case when the affected cell is in disk
+
 	}
 	public void writeToCache(SpatialObject o, Type t){
 		/*
@@ -121,7 +141,7 @@ public class StorageManager {
 			}
 		}
 	}
-	
+
 	public double updateUBInDisk(Cell c, SpatialObject o){
 		//update the loose upper bound for the cells in disk
 		if(upperBoundInRestCells.size() < _config.ubInRestCellsCount){
