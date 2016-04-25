@@ -26,4 +26,8 @@ public class SpatialObject {
 		Cell c = new Cell(_x, _y, a, b);
 		return c;
 	}
+	public double size(){
+		//in KB
+		return 1.0 * (3 * 4 + 3 * 8 + attributes.size() * 4)/1024;
+	}
 }

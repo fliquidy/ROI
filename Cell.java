@@ -39,5 +39,8 @@ public class Cell {
 	public Cell upright(){
 		return new Cell(this._x+1, this._y+1);
 	}
-	
+	public double size(){
+		//in KB
+		return 2 * 32.0 / 1024;
+	}
 }

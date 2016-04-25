@@ -1,6 +1,9 @@
 package ROI;
 import java.io.File;
-
+import java.util.NavigableSet;
+import java.util.HashMap;
+import java.util.NavigableMap;
+import java.util.Vector;
 import org.mapdb.*;
 public class ROI {
 
@@ -12,16 +15,11 @@ public class ROI {
 		System.out.println(f);
 		System.out.println("test");
 		DB db = DBMaker.newFileDB(new File("test.db")).closeOnJvmShutdown().make();
-		BTreeMap<String, Integer> map = db.createTreeMap("treemap").makeOrGet();
-		map.put("ff", 2);
-		db.commit();
-		db.close();
-		
-		db = DBMaker.newFileDB(new File("test.db")).closeOnJvmShutdown().make();
-		map = db.createTreeMap("treemap").makeOrGet();
-		map.put("test", 1);
-		System.out.println(map.get("ff"));
-		
+
+		NavigableSet<Fun.Tuple2<String, Long>> multiMap = db.getTreeSet("test");
+		multiMap = db.createTreeSet("test2").serializer(BTreeKeySerializer.TUPLE2).make();
+		multiMap.add(Fun.t2("aa", 1L));
+		multiMap.add(Fun.t2("aa", 2L));
 		//System.out.println(map.get("something"));
 	}
 
