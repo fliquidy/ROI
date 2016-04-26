@@ -107,7 +107,7 @@ public class StorageManager {
 			//write cache to disk
 			flush();
 		}
-		cacheSize +=
+		//cacheSize +=
 	}
 	
 	public void writeToDisk(Cell c, Vector<SpatialObject> oVec){
@@ -221,15 +221,15 @@ public class StorageManager {
 		}
 	}
 	public void balance(){
-		
+
 	}
-	public void swap(){
+	/*public void swap(){
 		if(ubInMemVec.firstElement()._UB < ub){
 			if(MemIndexSize() + upp){
 
 			}
 		}
-	}
+	}*/
 	public void loadCellIntoMem(Cell c){
 		//load the contents in a cell into memory
 		//only cells with top highest upper bound should be maintained in memory
