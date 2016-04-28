@@ -4,6 +4,7 @@ public class ITreeNode {
 	public ITreeNode lchild;
 	public ITreeNode rchild;
 	public ITreeNode father;
+	public ITreeNode target;
 	public double discriminant;
 	public double degree;
 	public double excess;
