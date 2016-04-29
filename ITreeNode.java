@@ -5,6 +5,7 @@ public class ITreeNode {
 	public ITreeNode rchild;
 	public ITreeNode father;
 	public ITreeNode target;
+	public double maxdegree;
 	public double discriminant;
 	public double degree;
 	public double excess;

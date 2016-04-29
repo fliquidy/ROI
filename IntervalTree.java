@@ -27,9 +27,50 @@ public class IntervalTree {
             tree[tIdx] = new ITreeNode(0.5 * (tree[rIdx].discriminant + tree[rIdx-1].discriminant));
         }
     }
-    public void fin(int nodeIdx){
+    public void insert_interval(double l, double r, double degree, int nodeIdx){
+        if(l == r)return;
+        while(nodeIdx < tree.length){
+            if(tree[nodeIdx].discriminant < l){
+                nodeIdx = nodeIdx * 2 + 1;
+            }
+            else if(tree[nodeIdx].discriminant > r){
+                nodeIdx = nodeIdx * 2;
+            }
+            else{
+                tree[nodeIdx].window_x = l;
+                tree[nodeIdx].
+            }
+        }
+    }
+    public void fin(int nodeIdx, double l, double r){
+        int lchildIdx = nodeIdx * 2;
+        int rchildIdx = nodeIdx * 2 + 1;
+        if(lchildIdx < tree.length){
+            tree[lchildIdx].excess += tree[nodeIdx].excess;
+            if(tree[lchildIdx].attachedWindow){
+                tree[lchildIdx].degree += tree[nodeIdx].excess;
+            }
+            if(tree[lchildIdx].target != null){
+                tree[lchildIdx].maxdegree += tree[nodeIdx].excess;
+            }
+        }
+        if(rchildIdx < tree.length){
+            tree[rchildIdx].excess += tree[nodeIdx].excess;
+            if(tree[rchildIdx].attachedWindow){
+                tree[rchildIdx].degree += tree[nodeIdx].excess;
+            }
+            if(tree[rchildIdx].target != null){
+                tree[rchildIdx].maxdegree += tree[nodeIdx].excess;
+            }
+        }
+        tree[nodeIdx].excess = 0;
+        if(tree[nodeIdx].attachedWindow){
+
+        }
+
 
     }
+
     public static void main(String args[]){
         double[] tvec = new double[5];
         tvec[0] = 1.0;
@@ -39,5 +80,6 @@ public class IntervalTree {
         tvec[4] = 5.0;
         IntervalTree it = new IntervalTree();
         it.build(tvec);
+
     }
 }
