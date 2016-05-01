@@ -7,6 +7,15 @@ import java.lang.Math;
  */
 public class IntervalTree {
     public ITreeNode[] tree;
+    public double Ll;
+    public double Lr;
+    public double LDegree;
+    public boolean hasLWindow;
+    public boolean hasRWindow;
+    public double Rl;
+    public double Rr;
+    public double RDegree;
+
     public void build(double[] leaves){
         //build the interval tree.
         int height = (int) Math.floor(Math.log((double)leaves.length)/Math.log(2.0))+1;
@@ -26,6 +35,8 @@ public class IntervalTree {
             int rIdx = (tIdx * 2 + 1) * (int)(Math.pow(2, height - level - 1));
             tree[tIdx] = new ITreeNode(0.5 * (tree[rIdx].discriminant + tree[rIdx-1].discriminant));
         }
+        hasLWindow = false;
+        hasRWindow = false;
     }
     public void insert_interval(double l, double r, double degree, int nodeIdx){
         if(l == r)return;
@@ -38,13 +49,16 @@ public class IntervalTree {
             }
             else{
                 tree[nodeIdx].window_x = l;
-                tree[nodeIdx].
+                tree[nodeIdx].window_y = r;
+                tree[nodeIdx].degree = 0;
+                tree[nodeIdx].attachedWindow = true;
             }
         }
     }
-    public void fin(int nodeIdx, double l, double r){
+    public void fin(int nodeIdx, double l, double r, double degree){
         int lchildIdx = nodeIdx * 2;
         int rchildIdx = nodeIdx * 2 + 1;
+        //propogate
         if(lchildIdx < tree.length){
             tree[lchildIdx].excess += tree[nodeIdx].excess;
             if(tree[lchildIdx].attachedWindow){
@@ -65,12 +79,99 @@ public class IntervalTree {
         }
         tree[nodeIdx].excess = 0;
         if(tree[nodeIdx].attachedWindow){
-
+            //window attached. Check whether the attached window should be split.
+            if(tree[nodeIdx].window_x <= l && tree[nodeIdx].window_y >= r){
+                //new interval is contained in the window
+                if(tree[nodeIdx].discriminant < l){
+                    Ll = l;
+                    Lr = r;
+                    LDegree = tree[nodeIdx].degree + degree;
+                    Rl = r;
+                    Rr = tree[nodeIdx].window_y;
+                    RDegree = tree[nodeIdx].degree;
+                    tree[nodeIdx].window_y = l;
+                }
+                else if(tree[nodeIdx].discriminant > r){
+                    Ll = tree[nodeIdx].window_x;
+                    Lr = l;
+                    LDegree = tree[nodeIdx].degree;
+                    Rl = l;
+                    Rr = r;
+                    RDegree = tree[nodeIdx].degree + degree;
+                    tree[nodeIdx].window_x = r;
+                }
+                else{
+                    Ll = tree[nodeIdx].window_x;
+                    Lr = l;
+                    LDegree = tree[nodeIdx].degree;
+                    Rl = r;
+                    Rr = tree[nodeIdx].window_y;
+                    RDegree = tree[nodeIdx].degree;
+                    tree[nodeIdx].degree += degree;
+                    tree[nodeIdx].window_x = l;
+                    tree[nodeIdx].window_y = r;
+                }
+                hasLWindow = true;
+                hasRWindow = true;
+            }
+            else if(l > tree[nodeIdx].window_x && l < tree[nodeIdx].window_y && r > tree[nodeIdx].window_y){
+                if(tree[nodeIdx].discriminant < l){
+                    Ll = l;
+                    Lr = tree[nodeIdx].window_y;
+                    LDegree = tree[nodeIdx].degree + degree;
+                    tree[nodeIdx].window_y = l;
+                }
+                else{
+                    Ll = tree[nodeIdx].window_x;
+                    Lr = l;
+                    LDegree = tree[nodeIdx].degree;
+                    tree[nodeIdx].window_x = l;
+                    tree[nodeIdx].degree += degree;
+                }
+                hasLWindow = true;
+            }
+            else if(r > tree[nodeIdx].window_x && r < tree[nodeIdx].window_y && l < tree[nodeIdx].window_x){
+                if(tree[nodeIdx].discriminant < r){
+                    Rl = r;
+                    Rr = tree[nodeIdx].window_y;
+                    RDegree = tree[nodeIdx].degree;
+                    tree[nodeIdx].window_y = r;
+                    tree[nodeIdx].degree += degree;
+                }
+                else{
+                    Rl = tree[nodeIdx].window_x;
+                    Rr = r;
+                    RDegree = tree[nodeIdx].degree + degree;
+                    tree[nodeIdx].window_x = r;
+                }
+                hasRWindow = true;
+            }
+            else{
+                System.err.print("Attached window doesn't intersect with the interval.");
+            }
         }
-
-
+        else{
+            //no window attached, check whether should LWindow and RWindow should be inserted here.
+            if(hasLWindow && tree[nodeIdx].discriminant > Ll && tree[nodeIdx].discriminant < Lr){
+                tree[nodeIdx].window_x = Ll;
+                tree[nodeIdx].window_y = Lr;
+                tree[nodeIdx].degree = LDegree;
+                tree[nodeIdx].attachedWindow = true;
+                hasLWindow = false;
+            }
+            if(hasRWindow && tree[nodeIdx].discriminant > Rl && tree[nodeIdx].discriminant < Rr){
+                tree[nodeIdx].window_x = Rl;
+                tree[nodeIdx].window_y = Rr;
+                tree[nodeIdx].degree = RDegree;
+                tree[nodeIdx].attachedWindow = true;
+                hasRWindow = false;
+            }
+        }
     }
 
+    public void fr(int nodeIdx, double l, double r, double degree){
+
+    }
     public static void main(String args[]){
         double[] tvec = new double[5];
         tvec[0] = 1.0;
