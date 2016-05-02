@@ -46,7 +46,7 @@ public class IntervalTree {
             if(tree[vnIdx].discriminant > r){
                 vnIdx = vnIdx * 2;
             }
-            else(tree[vnIdx].discriminant < l){
+            else{
                 vnIdx = vnIdx * 2 + 1;
             }
         }
@@ -59,9 +59,67 @@ public class IntervalTree {
         while(rvnIdx < tree.length && rvnIdx > 0){
             rvnIdx = fr(rvnIdx, l, r, weight, isTop);
         }
+        lvnIdx = 0 - lvnIdx;
+        rvnIdx = 0 - rvnIdx;
+        backward(vnIdx, lvnIdx, rvnIdx);
     }
-    public void backward(){
-
+    public void backward(int vnIdx, int lcIdx, int rcIdx){
+        while(lcIdx != vnIdx){
+            tree[lcIdx].maxdegree = 0;
+            tree[lcIdx].targetIdx = 0;
+            if(tree[lcIdx].attachedWindow && tree[lcIdx].degree > tree[lcIdx].maxdegree){
+                tree[lcIdx].maxdegree = tree[lcIdx].degree;
+                tree[lcIdx].targetIdx = lcIdx;
+            }
+            int lc = 2 * lcIdx;
+            int rc = 2 * lcIdx + 1;
+            if(lc < tree.length && tree[lc].targetIdx != 0 && tree[lc].maxdegree > tree[lcIdx].maxdegree){
+                tree[lcIdx].maxdegree = tree[lc].maxdegree;
+                tree[lcIdx].targetIdx = tree[lc].targetIdx;
+            }
+            if(rc < tree.length && tree[rc].targetIdx != 0 && tree[rc].maxdegree > tree[lcIdx].maxdegree){
+                tree[lcIdx].maxdegree = tree[rc].maxdegree;
+                tree[lcIdx].targetIdx = tree[rc].targetIdx;
+            }
+            lcIdx = lcIdx / 2;
+        }
+        while(rcIdx != vnIdx){
+            tree[rcIdx].maxdegree = 0;
+            tree[rcIdx].targetIdx = 0;
+            if(tree[rcIdx].attachedWindow && tree[rcIdx].degree > tree[rcIdx].maxdegree){
+                tree[rcIdx].maxdegree = tree[rcIdx].degree;
+                tree[rcIdx].targetIdx = rcIdx;
+            }
+            int lc = 2 * rcIdx;
+            int rc = 2 * rcIdx + 1;
+            if(lc < tree.length && tree[lc].targetIdx != 0 && tree[lc].maxdegree > tree[rcIdx].maxdegree){
+                tree[rcIdx].maxdegree = tree[lc].maxdegree;
+                tree[rcIdx].targetIdx = tree[lc].targetIdx;
+            }
+            if(rc < tree.length && tree[rc].targetIdx != 0 && tree[rc].maxdegree > tree[rcIdx].maxdegree){
+                tree[rcIdx].maxdegree = tree[rc].maxdegree;
+                tree[rcIdx].targetIdx = tree[rc].targetIdx;
+            }
+            while(vnIdx > 0){
+                tree[vnIdx].maxdegree = 0;
+                tree[vnIdx].targetIdx = 0;
+                if(tree[vnIdx].attachedWindow && tree[vnIdx].degree > tree[vnIdx].maxdegree){
+                    tree[vnIdx].maxdegree = tree[vnIdx].degree;
+                    tree[vnIdx].targetIdx = vnIdx;
+                }
+                lc = 2 * vnIdx;
+                rc = 2 * vnIdx + 1;
+                if(lc < tree.length && tree[lc].targetIdx != 0 && tree[lc].maxdegree > tree[vnIdx].maxdegree){
+                    tree[vnIdx].maxdegree = tree[lc].maxdegree;
+                    tree[vnIdx].targetIdx = tree[lc].targetIdx;
+                }
+                if(rc < tree.length && tree[rc].targetIdx != 0 && tree[rc].maxdegree > tree[vnIdx].maxdegree ){
+                    tree[vnIdx].maxdegree = tree[rc].maxdegree;
+                    tree[vnIdx].targetIdx = tree[rc].targetIdx;
+                }
+                vnIdx = vnIdx / 2;
+            }
+        }
     }
     public void fin(int nodeIdx, double l, double r, double degree){
         int lchildIdx = nodeIdx * 2;
@@ -250,7 +308,7 @@ public class IntervalTree {
                 return lchildIdx;
             }
             else{
-                return 0;
+                return 0 - nodeIdx;
             }
         }
         else{
@@ -258,7 +316,7 @@ public class IntervalTree {
                 return rchildIdx;
             }
             else{
-                return 0;
+                return 0 - nodeIdx;
             }
         }
     }
@@ -336,7 +394,7 @@ public class IntervalTree {
                 return rchildIdx;
             }
             else{
-                return 0;
+                return 0 - nodeIdx;
             }
         }
         else{
@@ -344,7 +402,7 @@ public class IntervalTree {
                 return lchildIdx;
             }
             else{
-                return 0;
+                return 0 - nodeIdx;
             }
         }
     }
