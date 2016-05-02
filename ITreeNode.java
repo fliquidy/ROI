@@ -1,10 +1,7 @@
 package ROI;
 
 public class ITreeNode {
-	public ITreeNode lchild;
-	public ITreeNode rchild;
-	public ITreeNode father;
-	public ITreeNode target;
+	public int targetIdx;
 	public double maxdegree;
 	public double discriminant;
 	public double degree;
