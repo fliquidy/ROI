@@ -36,13 +36,19 @@ public class IntervalTree {
             int rIdx = (tIdx * 2 + 1) * (int)(Math.pow(2, height - level - 1));
             tree[tIdx] = new ITreeNode(0.5 * (tree[rIdx].discriminant + tree[rIdx-1].discriminant));
         }
+        tree[0] = new ITreeNode(0);
         hasLWindow = false;
         hasRWindow = false;
+        tree[1].attachedWindow = true;
+        tree[1].window_x = leaves[0];
+        tree[1].window_y = rightBound;
+        tree[1].degree = 0;
     }
     public void forward(boolean isTop, double l, double r, double weight){
         int vnIdx = 1;
         while(tree[vnIdx].discriminant > r || tree[vnIdx].discriminant < l){
-            fin(vnIdx, l, r, weight);
+          //  System.out.println("vnIdx="+vnIdx);
+            fin(vnIdx, l, r, weight, isTop);
             if(tree[vnIdx].discriminant > r){
                 vnIdx = vnIdx * 2;
             }
@@ -50,21 +56,27 @@ public class IntervalTree {
                 vnIdx = vnIdx * 2 + 1;
             }
         }
-        fin(vnIdx, l, r, weight);
+//        System.out.println("vnIdx = "+vnIdx);
+        fin(vnIdx, l, r, weight, isTop);
         int lvnIdx = vnIdx * 2;
         int rvnIdx = vnIdx * 2 + 1;
         while(lvnIdx < tree.length && lvnIdx > 0){
+//            System.out.println("lvnIdx = "+lvnIdx);
             lvnIdx = fl(lvnIdx, l, r, weight, isTop);
         }
         while(rvnIdx < tree.length && rvnIdx > 0){
+//            System.out.println("rvnIdx = "+rvnIdx);
             rvnIdx = fr(rvnIdx, l, r, weight, isTop);
         }
         lvnIdx = 0 - lvnIdx;
         rvnIdx = 0 - rvnIdx;
+//        System.out.println("backward:"+vnIdx + " "+lvnIdx + " "+rvnIdx);
         backward(vnIdx, lvnIdx, rvnIdx);
+//        System.out.println("processed");
     }
     public void backward(int vnIdx, int lcIdx, int rcIdx){
         while(lcIdx != vnIdx){
+            //System.out.println(lcIdx+" "+vnIdx);
             tree[lcIdx].maxdegree = 0;
             tree[lcIdx].targetIdx = 0;
             if(tree[lcIdx].attachedWindow && tree[lcIdx].degree > tree[lcIdx].maxdegree){
@@ -81,47 +93,53 @@ public class IntervalTree {
                 tree[lcIdx].maxdegree = tree[rc].maxdegree;
                 tree[lcIdx].targetIdx = tree[rc].targetIdx;
             }
+            System.out.println("backward: nodeIdx: "+lcIdx+", maxD: "+tree[lcIdx].maxdegree+", target: "+tree[lcIdx].targetIdx);
             lcIdx = lcIdx / 2;
         }
-        while(rcIdx != vnIdx){
+        while(rcIdx != vnIdx) {
             tree[rcIdx].maxdegree = 0;
             tree[rcIdx].targetIdx = 0;
-            if(tree[rcIdx].attachedWindow && tree[rcIdx].degree > tree[rcIdx].maxdegree){
+            if (tree[rcIdx].attachedWindow && tree[rcIdx].degree > tree[rcIdx].maxdegree) {
                 tree[rcIdx].maxdegree = tree[rcIdx].degree;
                 tree[rcIdx].targetIdx = rcIdx;
             }
             int lc = 2 * rcIdx;
             int rc = 2 * rcIdx + 1;
-            if(lc < tree.length && tree[lc].targetIdx != 0 && tree[lc].maxdegree > tree[rcIdx].maxdegree){
+            if (lc < tree.length && tree[lc].targetIdx != 0 && tree[lc].maxdegree > tree[rcIdx].maxdegree) {
                 tree[rcIdx].maxdegree = tree[lc].maxdegree;
                 tree[rcIdx].targetIdx = tree[lc].targetIdx;
             }
-            if(rc < tree.length && tree[rc].targetIdx != 0 && tree[rc].maxdegree > tree[rcIdx].maxdegree){
+            if (rc < tree.length && tree[rc].targetIdx != 0 && tree[rc].maxdegree > tree[rcIdx].maxdegree) {
                 tree[rcIdx].maxdegree = tree[rc].maxdegree;
                 tree[rcIdx].targetIdx = tree[rc].targetIdx;
             }
-            while(vnIdx > 0){
-                tree[vnIdx].maxdegree = 0;
-                tree[vnIdx].targetIdx = 0;
-                if(tree[vnIdx].attachedWindow && tree[vnIdx].degree > tree[vnIdx].maxdegree){
-                    tree[vnIdx].maxdegree = tree[vnIdx].degree;
-                    tree[vnIdx].targetIdx = vnIdx;
-                }
-                lc = 2 * vnIdx;
-                rc = 2 * vnIdx + 1;
-                if(lc < tree.length && tree[lc].targetIdx != 0 && tree[lc].maxdegree > tree[vnIdx].maxdegree){
-                    tree[vnIdx].maxdegree = tree[lc].maxdegree;
-                    tree[vnIdx].targetIdx = tree[lc].targetIdx;
-                }
-                if(rc < tree.length && tree[rc].targetIdx != 0 && tree[rc].maxdegree > tree[vnIdx].maxdegree ){
-                    tree[vnIdx].maxdegree = tree[rc].maxdegree;
-                    tree[vnIdx].targetIdx = tree[rc].targetIdx;
-                }
-                vnIdx = vnIdx / 2;
-            }
+            rcIdx = rcIdx / 2;
+            System.out.println("backward: nodeIdx: "+rcIdx+", maxD: "+tree[rcIdx].maxdegree+", target: "+tree[rcIdx].targetIdx);
         }
+        while(vnIdx > 0){
+            tree[vnIdx].maxdegree = 0;
+            tree[vnIdx].targetIdx = 0;
+            if(tree[vnIdx].attachedWindow && tree[vnIdx].degree > tree[vnIdx].maxdegree){
+                tree[vnIdx].maxdegree = tree[vnIdx].degree;
+                tree[vnIdx].targetIdx = vnIdx;
+            }
+            int lc = 2 * vnIdx;
+            int rc = 2 * vnIdx + 1;
+            if(lc < tree.length && tree[lc].targetIdx != 0 && tree[lc].maxdegree > tree[vnIdx].maxdegree){
+                tree[vnIdx].maxdegree = tree[lc].maxdegree;
+                tree[vnIdx].targetIdx = tree[lc].targetIdx;
+            }
+            if(rc < tree.length && tree[rc].targetIdx != 0 && tree[rc].maxdegree > tree[vnIdx].maxdegree ){
+                tree[vnIdx].maxdegree = tree[rc].maxdegree;
+                tree[vnIdx].targetIdx = tree[rc].targetIdx;
+            }
+
+            System.out.println("backward: nodeIdx: "+vnIdx+", maxD: "+tree[vnIdx].maxdegree+", target: "+tree[vnIdx].targetIdx);
+            vnIdx = vnIdx / 2;
+        }
+
     }
-    public void fin(int nodeIdx, double l, double r, double degree){
+    public void fin(int nodeIdx, double l, double r, double degree, boolean isTop){
         int lchildIdx = nodeIdx * 2;
         int rchildIdx = nodeIdx * 2 + 1;
         //propogate
@@ -144,10 +162,13 @@ public class IntervalTree {
             }
         }
         tree[nodeIdx].excess = 0;
+ //       System.out.println("propogated");
         if(tree[nodeIdx].attachedWindow){
             //window attached. Check whether the attached window should be split.
+            System.out.println("nodeIDx: "+nodeIdx+" [x,y]: "+tree[nodeIdx].window_x+","+tree[nodeIdx].window_y+" [l,r]: "+l+","+r);
             if(tree[nodeIdx].window_x <= l && tree[nodeIdx].window_y >= r){
                 //new interval is contained in the window
+//                System.out.println("branch 1");
                 if(tree[nodeIdx].discriminant < l){
                     Ll = l;
                     Lr = r;
@@ -177,10 +198,16 @@ public class IntervalTree {
                     tree[nodeIdx].window_x = l;
                     tree[nodeIdx].window_y = r;
                 }
-                hasLWindow = true;
-                hasRWindow = true;
+                if(Ll != Lr) {
+                    hasLWindow = true;
+                }
+                if(Rl != Rr) {
+                    hasRWindow = true;
+                }
+
             }
             else if(l > tree[nodeIdx].window_x && l < tree[nodeIdx].window_y && r > tree[nodeIdx].window_y){
+//                System.out.println("branch 2");
                 if(tree[nodeIdx].discriminant < l){
                     Ll = l;
                     Lr = tree[nodeIdx].window_y;
@@ -194,9 +221,12 @@ public class IntervalTree {
                     tree[nodeIdx].window_x = l;
                     tree[nodeIdx].degree += degree;
                 }
-                hasLWindow = true;
+                if(Ll != Lr) {
+                    hasLWindow = true;
+                }
             }
             else if(r > tree[nodeIdx].window_x && r < tree[nodeIdx].window_y && l < tree[nodeIdx].window_x){
+//                System.out.println("branch 3");
                 if(tree[nodeIdx].discriminant < r){
                     Rl = r;
                     Rr = tree[nodeIdx].window_y;
@@ -210,14 +240,25 @@ public class IntervalTree {
                     RDegree = tree[nodeIdx].degree + degree;
                     tree[nodeIdx].window_x = r;
                 }
-                hasRWindow = true;
+                if(Rl != Rr) {
+                    hasRWindow = true;
+                }
+            }
+            else if(l <= tree[nodeIdx].window_x && r >= tree[nodeIdx].window_y){
+                if(isTop){
+                    tree[nodeIdx].degree += degree;
+                }
+                else{
+                    tree[nodeIdx].degree -= degree;
+                }
             }
             else{
-                System.err.print("Attached window doesn't intersect with the interval.");
+                System.err.println("Attached window doesn't intersect with the interval.");
             }
         }
         else{
             //no window attached, check whether should LWindow and RWindow should be inserted here.
+//            System.out.print("branch 4");
             if(hasLWindow && tree[nodeIdx].discriminant > Ll && tree[nodeIdx].discriminant < Lr){
                 tree[nodeIdx].window_x = Ll;
                 tree[nodeIdx].window_y = Lr;
@@ -258,6 +299,7 @@ public class IntervalTree {
         }
         tree[nodeIdx].excess = 0;
         if(tree[nodeIdx].attachedWindow){
+            System.out.println("FL: nodeIdx: "+nodeIdx+" [x,y]: "+tree[nodeIdx].window_x+", "+tree[nodeIdx].window_y+", [l,r]: "+l+", "+r);
             if(tree[nodeIdx].window_x >= l && tree[nodeIdx].window_y <= r){
                 if(isTop){
                     tree[nodeIdx].degree += degree;
@@ -271,26 +313,47 @@ public class IntervalTree {
                     System.err.print("Error: interval is contained by in the window");
                 }
                 if(tree[nodeIdx].discriminant < l){
-                    Ll = l;
-                    Lr = tree[nodeIdx].window_y;
-                    LDegree = tree[nodeIdx].degree + degree;
-                    hasLWindow = true;
-                    tree[nodeIdx].window_y = l;
+                    if(l != tree[nodeIdx].window_y) {
+                        Ll = l;
+                        Lr = tree[nodeIdx].window_y;
+                        LDegree = tree[nodeIdx].degree + degree;
+                        hasLWindow = true;
+                        tree[nodeIdx].window_y = l;
+                    }
                 }
                 else{
-                    Ll = tree[nodeIdx].window_x;
-                    Lr = l;
-                    LDegree = tree[nodeIdx].degree;
-                    hasLWindow = true;
-                    tree[nodeIdx].window_x = l;
+                    if(tree[nodeIdx].window_x != l) {
+                        Ll = tree[nodeIdx].window_x;
+                        Lr = l;
+                        LDegree = tree[nodeIdx].degree;
+                        hasLWindow = true;
+                        tree[nodeIdx].window_x = l;
+                    }
                     tree[nodeIdx].degree += degree;
                 }
+            }
+        }
+        else{
+            if(hasLWindow && tree[nodeIdx].discriminant > Ll && tree[nodeIdx].discriminant < Lr){
+                tree[nodeIdx].window_x = Ll;
+                tree[nodeIdx].window_y = Lr;
+                tree[nodeIdx].degree = LDegree;
+                tree[nodeIdx].attachedWindow = true;
+                hasLWindow = false;
+            }
+            if(hasRWindow && tree[nodeIdx].discriminant > Rl && tree[nodeIdx].discriminant < Rr){
+                tree[nodeIdx].window_x = Rl;
+                tree[nodeIdx].window_y = Rr;
+                tree[nodeIdx].degree = RDegree;
+                tree[nodeIdx].attachedWindow = true;
+                hasRWindow = false;
             }
         }
         if(tree[nodeIdx].discriminant > l ){
             if(isTop){
                 if(rchildIdx < tree.length){
-                   tree[rchildIdx].excess += degree;
+                    tree[rchildIdx].excess += degree;
+                    tree[rchildIdx].degree += degree;
                     if(tree[rchildIdx].targetIdx > 0){
                         tree[rchildIdx].maxdegree += degree;
                     }
@@ -299,6 +362,7 @@ public class IntervalTree {
             else{
                 if(rchildIdx < tree.length){
                     tree[rchildIdx].excess -= degree;
+                    tree[rchildIdx].degree -= degree;
                     if(tree[rchildIdx].targetIdx > 0){
                         tree[rchildIdx].maxdegree -= degree;
                     }
@@ -344,6 +408,7 @@ public class IntervalTree {
         }
         tree[nodeIdx].excess = 0;
         if(tree[nodeIdx].attachedWindow){
+            System.out.println("FR: nodeIdx: "+nodeIdx+" [x,y]: "+tree[nodeIdx].window_x+", "+tree[nodeIdx].window_y+", [l,r]: "+l+", "+r);
             if(tree[nodeIdx].window_x >= l && tree[nodeIdx].window_y <= r){
                 if(isTop){
                     tree[nodeIdx].degree += degree;
@@ -356,27 +421,49 @@ public class IntervalTree {
                 if(l >= tree[nodeIdx].window_x){
                     System.err.print("Error: interval is contained by in the window");
                 }
-                if(tree[nodeIdx].discriminant < r){
-                    Rl = tree[nodeIdx].window_x;
-                    Rr = r;
-                    RDegree = tree[nodeIdx].degree + degree;
-                    hasRWindow = true;
-                    tree[nodeIdx].window_x = r;
+                if(tree[nodeIdx].discriminant > r){
+                    if(r != tree[nodeIdx].window_x) {
+                        Rl = tree[nodeIdx].window_x;
+                        Rr = r;
+                        RDegree = tree[nodeIdx].degree + degree;
+                        hasRWindow = true;
+                        tree[nodeIdx].window_x = r;
+                    }
                 }
                 else{
-                    Rl = r;
-                    Rr = tree[nodeIdx].window_y;
-                    RDegree = tree[nodeIdx].degree;
-                    hasRWindow = true;
-                    tree[nodeIdx].window_y = r;
+                    if(r != tree[nodeIdx].window_y) {
+                        Rl = r;
+                        Rr = tree[nodeIdx].window_y;
+                        RDegree = tree[nodeIdx].degree;
+                        hasRWindow = true;
+                        tree[nodeIdx].window_y = r;
+                    }
                     tree[nodeIdx].degree += degree;
                 }
+            }
+            System.out.println("FR: nodeIdx: "+nodeIdx+" [x,y]: "+tree[nodeIdx].window_x+", "+tree[nodeIdx].window_y+", [l,r]: "+l+", "+r);
+        }
+        else{
+            if(hasLWindow && tree[nodeIdx].discriminant > Ll && tree[nodeIdx].discriminant < Lr){
+                tree[nodeIdx].window_x = Ll;
+                tree[nodeIdx].window_y = Lr;
+                tree[nodeIdx].degree = LDegree;
+                tree[nodeIdx].attachedWindow = true;
+                hasLWindow = false;
+            }
+            if(hasRWindow && tree[nodeIdx].discriminant > Rl && tree[nodeIdx].discriminant < Rr){
+                tree[nodeIdx].window_x = Rl;
+                tree[nodeIdx].window_y = Rr;
+                tree[nodeIdx].degree = RDegree;
+                tree[nodeIdx].attachedWindow = true;
+                hasRWindow = false;
             }
         }
         if(tree[nodeIdx].discriminant < r ){
             if(isTop){
                 if(lchildIdx < tree.length){
                    tree[lchildIdx].excess += degree;
+                    tree[lchildIdx].degree += degree;
                     if(tree[lchildIdx].targetIdx > 0){
                         tree[lchildIdx].maxdegree += degree;
                     }
@@ -385,6 +472,7 @@ public class IntervalTree {
             else{
                 if(lchildIdx < tree.length){
                     tree[lchildIdx].excess -= degree;
+                    tree[lchildIdx].degree -= degree;
                     if(tree[lchildIdx].targetIdx > 0){
                         tree[lchildIdx].maxdegree -= degree;
                     }
@@ -406,15 +494,65 @@ public class IntervalTree {
             }
         }
     }
-    public static void main(String args[]){
-        double[] tvec = new double[5];
-        tvec[0] = 1.0;
-        tvec[1] = 2.0;
-        tvec[2] = 3.0;
-        tvec[3] = 4.0;
-        tvec[4] = 5.0;
+    public static void testInterval(){
+        double[] leaves = new double[10];
+        for(int i=0; i < 10; i++){
+            leaves[i] = i;
+        }
         IntervalTree it = new IntervalTree();
-        it.build(tvec);
+        it.build(leaves);
+        System.out.println("Interval tree built.");
+        for(int i=1; i < it.tree.length; i++){
+            System.out.print("("+it.tree[i].discriminant+", "+it.tree[i].targetIdx+")\t");
+        }
+        System.out.println();
+        double[] x = new double[8];
+        double[] y = new double[8];
+        boolean[] top = new boolean[8];
+        x[0] = 2.0;
+        y[0] = 6.0;
+        top[0] = true;
+
+        x[1] = 4.0;
+        y[1] = 8.0;
+        top[1] = true;
+
+        x[2] = 1.0;
+        y[2] = 5.0;
+        top[2] = true;
+
+        x[3] = 2.0;
+        y[3] = 6.0;
+        top[3] = false;
+
+        x[4] = 3.0;
+        y[4] = 7.0;
+        top[4] = true;
+
+        x[5] = 4.0;
+        y[5] = 8.0;
+        top[5] = false;
+
+        x[6] = 1.0;
+        y[6] = 5.0;
+        top[6] = false;
+
+        x[7] = 3.0;
+        y[7] = 7.0;
+        top[7] = false;
+
+        for(int i=0; i < 8; i++){
+            it.forward(top[i], x[i], y[i], 1.0);
+            System.out.println("processing "+x[i]+" "+y[i]+" "+top[i]);
+            System.out.println("current best result: ["+it.tree[it.tree[1].targetIdx].window_x+", "+it.tree[it.tree[1].targetIdx].window_y+"] "+it.tree[1].maxdegree);
+            for(int j=1; j < it.tree.length; j++){
+                System.out.print(j+", ["+it.tree[j].window_x+","+it.tree[j].window_y+"], "+it.tree[j].degree+" , "+it.tree[j].excess+"||| ");
+            }
+            System.out.println();
+        }
+    }
+    public static void main(String args[]){
+       testInterval();
 
     }
 }

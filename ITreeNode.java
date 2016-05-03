@@ -9,7 +9,14 @@ public class ITreeNode {
 	public double window_x;
 	public double window_y;
 	public boolean attachedWindow;
-	public ITreeNode(double d){
+	public ITreeNode(double d)
+	{
 		this.discriminant = d;
+		targetIdx = 0;
+		maxdegree = 0;
+		degree = 0;
+		excess = 0;
+		attachedWindow = false;
+
 	}
 }
