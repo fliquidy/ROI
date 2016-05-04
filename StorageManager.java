@@ -29,6 +29,9 @@ public class StorageManager {
 	public Vector<CellUB> upperBoundInRestCells;
 	public Vector<CellUB> upperBoundInRestCellsBackup;
 
+	public UpperboundManager MemUM;
+
+	public UpperboundManager DiskUM;
 	
 	//config
 	Config _config;
