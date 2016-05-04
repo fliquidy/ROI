@@ -30,6 +30,9 @@ public class Cell {
 		this._x = c._x;
 		this._y = c._y;
 	}
+	public String toString(){
+		return "("+_x+", "+_y+")";
+	}
 	public Cell up(){
 		return new Cell(this._x, this._y+1);
 	}
