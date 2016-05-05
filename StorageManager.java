@@ -75,7 +75,16 @@ public class StorageManager {
 	
 	
 	public void maintainMemIndex(Cell c, SpatialObject o){
-		//process the case when the affected cell is in memory
+		//Process the case when the affected cell is in memory.
+
+		//Step 1: insert object o into mem.index
+		exactIndex.get(c).add(o);
+
+		//Step 2: update upper bounds for affected cells.
+		MemUM.update(c, );
+
+		//Step 3: Check whether need to search for exact result.
+
 		exactIndex.get(c).add(o);
 		memIndexSize += o.size();
 		double old_ub = ubInMem.get(c);
