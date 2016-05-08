@@ -20,25 +20,20 @@ public class UpperboundManager {
         myheap.add(ub);
     }
     public void update(Cell c, double value, double time){
-        int idx = mymap.get(c);
-        myheap.get(idx).update(value, time);
-        updateHeap(idx);
-    }
-    public void add(Cell c, double value, double time){
         int idx = 0;
         if(mymap.containsKey(c)){
             idx = mymap.get(c);
         }
         else{
-            System.out.println(c.toString());
-            idx = myheap.size();
+           idx = myheap.size();
             UpperBound ub = new UpperBound(value, time, c);
             myheap.add(ub);
             mymap.put(c, idx);
         }
-        myheap.get(idx).updatetime = time;
+        myheap.get(idx).update(value, time);
         updateHeap(idx);
     }
+
     public double getMax(){
         if(myheap.isEmpty()){
             return -1.0;
@@ -105,7 +100,7 @@ public class UpperboundManager {
         Cell[] c = new Cell[5];
         for(int i=0; i < 5; i++){
             c[i] = new Cell(i, i);
-            um.add(c[i], i, i);
+            um.update(c[i], i, i);
         }
         um.print();
         um.update(c[1], 5, 5);

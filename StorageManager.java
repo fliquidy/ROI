@@ -9,6 +9,28 @@ import org.mapdb.*;
 
 
 public class StorageManager {
+
+	public MemIndex memIdx;
+	public DiskIndex diskIdx;
+
+	public void processSpatialObject(SpatialObject o){
+		memIdx.processObject(o); //process mem index
+		diskIdx.processObject(o); //process disk index
+		maintainIndex(); //maintain mem and disk index
+		if(memIdx.updatedResult){
+			//update result
+			updateResult(memIdx.);
+		}
+	}
+	public void maintainIndex(){
+		//maintain memIdx and diskIdx.
+	}
+	public void updateResult(){
+
+	}
+
+
+
 	static DB db = DBMaker.newFileDB(new File("roi")).closeOnJvmShutdown().make();
 	double a;
 	double b;
@@ -81,7 +103,7 @@ public class StorageManager {
 		exactIndex.get(c).add(o);
 
 		//Step 2: update upper bounds for affected cells.
-		MemUM.update(c, );
+		MemUM.update(c, o._weight, o._time);
 
 		//Step 3: Check whether need to search for exact result.
 
