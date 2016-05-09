@@ -1,7 +1,7 @@
 package ROI;
 import java.util.Vector;
 
-public class SpatialObject {
+public class SpatialObject implements java.io.Serializable {
 	public int _id;
 	public int _date;
 	public int _time;
@@ -12,6 +12,7 @@ public class SpatialObject {
 	public SpatialObject(){
 		
 	}
+
 	public SpatialObject(int id, int date, int time, double x, double y, double weight){
 		this._id = id;
 		this._date = date;

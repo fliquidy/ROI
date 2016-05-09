@@ -1,7 +1,7 @@
 package ROI;
 import java.util.Objects;
 
-public class Cell {
+public class Cell implements java.io.Serializable, java.lang.Comparable<Cell>{
 	public int _x;
 	public int _y;
 	public Cell(Cell c){
@@ -45,5 +45,12 @@ public class Cell {
 	public double size(){
 		//in KB
 		return 2 * 32.0 / 1024;
+	}
+	public int compareTo(Cell c){
+		if(this._x > c._x)return 1;
+		if(this._x < c._x)return -1;
+		if(this._y > c._y)return 1;
+		if(this._y < c._y)return -1;
+		return 0;
 	}
 }

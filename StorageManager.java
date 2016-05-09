@@ -1,29 +1,71 @@
 package ROI;
 import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Vector;
-import java.util.NavigableSet;
+import java.util.*;
+
 import org.mapdb.*;
 
 
 public class StorageManager {
 
+	public static double currentWindow;
+	public static double pastWindow;
+	public static double validWindow;
+	public static double currentTime;
+	public static Config config;
+
 	public MemIndex memIdx;
 	public DiskIndex diskIdx;
 
-	public void processSpatialObject(SpatialObject o){
-		memIdx.processObject(o); //process mem index
-		diskIdx.processObject(o); //process disk index
-		maintainIndex(); //maintain mem and disk index
-		if(memIdx.updatedResult){
-			//update result
-			updateResult(memIdx.);
+	public void processSpatialObject(SpatialObject o, ObjectType t){
+		StorageManager.currentTime = o._time;
+		Cell c = o.locateCell(a, b);
+		Cell cu = c.up();
+		Cell cr = c.right();
+		Cell cur = c.upright();
+		if(cellsInMem.contains(c)){
+			memIdx.insertIntoIndex(o, c, t);
 		}
+		else{
+			diskIdx.insertIntoIndex(o, c, t);
+		}
+		if(cellsInMem.contains(cu)){
+			memIdx.insertIntoIndex(o, cu, t);
+		}
+		else{
+			diskIdx.insertIntoIndex(o, cu, t);
+		}
+		if(cellsInMem.contains(cr)){
+			memIdx.insertIntoIndex(o, cr, t);
+		}
+		else{
+			diskIdx.insertIntoIndex(o, cr, t);
+		}
+		if(cellsInMem.contains(cur)){
+			memIdx.insertIntoIndex(o, cur, t);
+		}
+		else{
+			diskIdx.insertIntoIndex(o, cur, t);
+		}
+
+		while(maintainIndex(memIdx, diskIdx)){
+			memIdx.search();
+		}
+
 	}
-	public void maintainIndex(){
+	public boolean maintainIndex(MemIndex mIdx, DiskIndex dIdx){
 		//maintain memIdx and diskIdx.
+		if(diskIdx.ubm.getMax() < )
+		return true;
+	}
+	public void swap(MemIndex mIdx, DiskIndex dIdx){
+		UpperBound dub = dIdx.ubm.getMaxUB();
+		UpperBound mub = mIdx.ubmin.getMaxUB();
+		mIdx.ubm.updateCellUB(mub.c, dub.c, dub.upperbound, dub.updatetime);
+		dIdx.ubm.updateCellUB(dub.c, mub.c, 0 - mub.upperbound, mub.updatetime);
+		LinkedList<SpatialObject> dl = dIdx.retrieve(dub.c);
+		mIdx.write(dub.c, dl);
+		LinkedList<SpatialObject> ml = mIdx.retrieve(mub.c);
+		dIdx.write(mub.c, ml);
 	}
 	public void updateResult(){
 

@@ -19,6 +19,52 @@ public class UpperboundManager {
         UpperBound ub = new UpperBound();
         myheap.add(ub);
     }
+    public double getUB(Cell c){
+        return myheap.get(mymap.get(c)).upperbound;
+    }
+    public void updateUB(Cell c, double value, double time, ObjectType t){
+        int idx = 0;
+        if(mymap.containsKey(c)){
+            idx = mymap.get(c);
+        }
+        else{
+           idx = myheap.size();
+            UpperBound ub = new UpperBound(value, time, c);
+            myheap.add(ub);
+            mymap.put(c, idx);
+        }
+        if(t == ObjectType.Old){
+            myheap.get(idx).updatePastUB(value);
+        }
+        else if(t == ObjectType.New){
+            myheap.get(idx).updateCurrentUB(value);
+        }
+        else{
+            System.err.println("Wrong type");
+        }
+        updateHeap(idx);
+    }
+    public void updateCellUB(Cell oldC, Cell newC, double value, double time){
+        int idx = mymap.get(oldC);
+        if(time > 0){
+            myheap.get(idx).update(newC, value, time);
+        }
+        else{
+            myheap.get(idx).update(newC, value);
+        }
+        updateHeap(idx);
+    }
+    public void updateMax(Cell c, double value, double time){
+        mymap.remove(myheap.get(1).c);
+        mymap.put(c, 1);
+        if(time > 0){
+            myheap.get(1).update(value);
+        }
+        else{
+            myheap.get(1).update(value, time);
+        }
+        updateHeap(1);
+    }
     public void update(Cell c, double value, double time){
         int idx = 0;
         if(mymap.containsKey(c)){
@@ -30,7 +76,12 @@ public class UpperboundManager {
             myheap.add(ub);
             mymap.put(c, idx);
         }
-        myheap.get(idx).update(value, time);
+        if(time > 0){
+            myheap.get(idx).update(value);
+        }
+        else {
+            myheap.get(idx).update(value, time);
+        }
         updateHeap(idx);
     }
 
@@ -44,8 +95,9 @@ public class UpperboundManager {
         if(myheap.size()<2){
             return null;
         }
-        return myheap.get(1);
+        return myheap.get(1).copy();
     }
+
     private void updateHeap(int index){
         int father = index/2;
         int lchild = index * 2;
