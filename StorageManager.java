@@ -54,18 +54,29 @@ public class StorageManager {
 	}
 	public boolean maintainIndex(MemIndex mIdx, DiskIndex dIdx){
 		//maintain memIdx and diskIdx.
-		if(diskIdx.ubm.getMax() < )
+		if(mIdx.minUB() > dIdx.maxUB()){
+			return false;
+		}
+		while(swap(mIdx, dIdx));
+
 		return true;
 	}
-	public void swap(MemIndex mIdx, DiskIndex dIdx){
-		UpperBound dub = dIdx.ubm.getMaxUB();
-		UpperBound mub = mIdx.ubmin.getMaxUB();
-		mIdx.ubm.updateCellUB(mub.c, dub.c, dub.upperbound, dub.updatetime);
+	public boolean swap(MemIndex mIdx, DiskIndex dIdx){
+		if(mIdx.minUB() > dIdx.maxUB()){
+			return false;
+		}
+		UpperBound dub = dIdx.getMax();
+		UpperBound mub = mIdx.getMin();
+		mub.upperbound = 0 - mub.upperbound;
+//		mIdx.ubm.updateCellUB(mub.c, dub.c, dub.upperbound, dub.updatetime);
+		mIdx.setUB(mub.c, dub.c, dub.upperbound, dub.updatetime);
 		dIdx.ubm.updateCellUB(dub.c, mub.c, 0 - mub.upperbound, mub.updatetime);
 		LinkedList<SpatialObject> dl = dIdx.retrieve(dub.c);
 		mIdx.write(dub.c, dl);
 		LinkedList<SpatialObject> ml = mIdx.retrieve(mub.c);
 		dIdx.write(mub.c, ml);
+		mIdx.remove(mub.c);
+		return true;
 	}
 	public void updateResult(){
 

@@ -33,6 +33,13 @@ public class DiskIndex {
         comap.put(c, l);
         db.commit();
     }
+    public UpperBound getMax(){
+        return ubm.getMaxUB();
+    }
+    public double maxUB(){
+        return ubm.getMax();
+    }
+
     public void insertIntoIndex(SpatialObject o, Cell c, ObjectType t){
         if(t == ObjectType.New){
             cacheObj.add(o);

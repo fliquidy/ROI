@@ -21,6 +21,20 @@ public class MemIndex {
         ubmin = new UpperboundManager();
         exactIndex = new HashMap<>();
     }
+    public void setUB(Cell oldc, Cell newc, double value, double time){
+        ubm.updateCellUB(oldc, newc, value, time);
+        ubmin.updateCellUB(oldc, newc, value, time);
+    }
+    public void increaseUB(Cell c, double value, double time, ObjectType t){
+        ubm.updateUB(c, value, time, t);
+        ubmin.updateUB(c, 0-value, time, t);
+    }
+    public UpperBound getMin(){
+        return ubmin.getMaxUB();
+    }
+    public double minUB(){
+        return 0 - ubmin.getMax();
+    }
     public void write(Cell c, LinkedList<SpatialObject> l){
         TwoWindowLists tl = new TwoWindowLists();
         for(SpatialObject o : l){
@@ -32,6 +46,9 @@ public class MemIndex {
             }
         }
         exactIndex.put(c, tl);
+    }
+    public void remove(Cell c){
+        exactIndex.remove(c);
     }
     public LinkedList<SpatialObject> retrieve(Cell c){
         TwoWindowLists tl = exactIndex.get(c);
@@ -45,17 +62,21 @@ public class MemIndex {
             if(t == ObjectType.New) {
                 //add to index
                 exactIndex.get(c).add(o);
-                ubm.updateUB(c, o._weight/StorageManager.currentWindow, -1, ObjectType.New);
+                //ubm.updateUB(c, o._weight/StorageManager.currentWindow, -1, ObjectType.New);
+                increaseUB(c, o._weight/StorageManager.currentTime, -1, ObjectType.New);
             }
             else if(t == ObjectType.Old){
                 //update weight
                 exactIndex.get(c).transform(o._weight/StorageManager.pastWindow);
-                ubm.updateUB(c, 0 - o._weight/StorageManager.currentWindow, -1, ObjectType.New);
-                ubm.updateUB(c, o._weight/StorageManager.pastWindow, -1, ObjectType.Old);
+//                ubm.updateUB(c, 0 - o._weight/StorageManager.currentWindow, -1, ObjectType.New);
+//                ubm.updateUB(c, o._weight/StorageManager.pastWindow, -1, ObjectType.Old);
+                increaseUB(c, 0-o._weight/StorageManager.currentTime, -1, ObjectType.New);
+                increaseUB(c, o._weight/StorageManager.pastWindow, -1, ObjectType.Old);
             }
             else {
                 //remove from index, doesn't affect the upper bound
-                ubm.updateUB(c, 0 - o._weight/StorageManager.pastWindow, -1, ObjectType.Old);
+//                ubm.updateUB(c, 0 - o._weight/StorageManager.pastWindow, -1, ObjectType.Old);
+                increaseUB(c, 0 - o._weight/StorageManager.pastWindow, -1, ObjectType.Old);
                 exactIndex.get(c).remove();
             }
         }
@@ -67,6 +88,9 @@ public class MemIndex {
         //process cells which are affected by object and are maintained in memory.
     }
     public void search(){
+
+    }
+    public void searchCell(Cell c){
 
     }
 }
