@@ -24,4 +24,13 @@ public class TwoWindowLists {
         pastWindow.addLast(o);
         currentWindow.removeFirst();
     }
+    public int size(){
+        return currentWindow.size() + pastWindow.size();
+    }
+    public LinkedList<Interval> getIntervals(){
+        LinkedList<Interval> list = new LinkedList<>();
+        for(SpatialObject o : pastWindow){
+
+        }
+    }
 }

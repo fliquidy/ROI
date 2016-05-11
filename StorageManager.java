@@ -58,7 +58,6 @@ public class StorageManager {
 			return false;
 		}
 		while(swap(mIdx, dIdx));
-
 		return true;
 	}
 	public boolean swap(MemIndex mIdx, DiskIndex dIdx){
