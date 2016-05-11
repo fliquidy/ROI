@@ -17,10 +17,10 @@ public class Interval implements Comparable<Interval>{
         
     }
     public int compareTo(Interval it){
-        if(y < it.y)return 1;
-        if(y > it.y) return -1;
-        if(et == EdgeType.Down && it.et == EdgeType.Up) return 1;
-        if(et == EdgeType.Up && it.et == EdgeType.Down) return -1;
+        if(y < it.y)return -1;
+        if(y > it.y) return 1;
+        if(et == EdgeType.Down && it.et == EdgeType.Up) return -1;
+        if(et == EdgeType.Up && it.et == EdgeType.Down) return 1;
         return 0;
     }
 

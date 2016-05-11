@@ -32,5 +32,6 @@ public class TwoWindowLists {
         for(SpatialObject o : pastWindow){
 
         }
+        return null;
     }
 }

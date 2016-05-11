@@ -1,5 +1,6 @@
 package ROI;
 import javax.naming.ldap.Rdn;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Vector;
 import java.lang.Math;
@@ -494,6 +495,58 @@ public class IntervalTree {
             }
         }
     }
+    public static void testTuah(){
+        double[] xs = new double[10];
+        double[] ys = new double[10];
+        xs[0] = 0.7332764052899778;
+        xs[1] = 0.4323687715914065;
+        xs[2] = 0.1327378978953987;
+        xs[3] = 0.8323628141241542;
+        xs[4] = 0.8843138653539059;
+        xs[5] = 0.4718945615276069;
+        xs[6] = 0.4634896416403228;
+        xs[7] = 0.7408227484127;
+        xs[8] = 0.28553462333832036;
+        xs[9] = 0.05608415151339008;
+
+        ys[0] =  0.4256064451517516;
+        ys[1] =  0.9740435584295989;
+        ys[2] =  0.5197047406937022;
+        ys[3] =  0.7271674417008329;
+        ys[4] =  0.5587298778208042;
+        ys[5] =  0.5508769615680242;
+        ys[6] =  0.9011985556051308;
+        ys[7] =  0.27999403189856154;
+        ys[8] =  0.8587223635178663;
+        ys[9] =  0.11515839130071759;
+
+        double[] leaves = new double[22];
+        double minX = xs[0];
+        double maxX = xs[0];
+        for(int i=0; i < 10; i++){
+            leaves[2 * i] = xs[i] - 0.25;
+            leaves[2 * i + 1] = xs[i] + 0.25;
+            if(xs[i] - 0.25 < minX){
+                minX = xs[i] - 0.25;
+            }
+            if(xs[i] + 0.25 > maxX){
+                maxX = xs[i] + 0.25;
+            }
+        }
+        leaves[20] = minX - 0.1;
+        leaves[21] = maxX + 0.1;
+        Arrays.sort(leaves);
+        Interval[] intervals = new Interval[20];
+        for(int i=0; i < 10; i++){
+            intervals[2*i] = new Interval(xs[i]-0.25, xs[i] + 0.25, ys[i] - 0.25, 1, ObjectType.New, EdgeType.Up);
+            intervals[2* i + 1] = new Interval(xs[i] - 0.25, xs[i] + 0.25, ys[i] + 0.25, 1, ObjectType.New, EdgeType.Down);
+        }
+        Arrays.sort(intervals);
+        for(int i=0; i < 20; i++){
+            System.out.println(intervals[i].y);
+        }
+
+    }
     public static void testInterval(){
         double[] leaves = new double[10];
         for(int i=0; i < 10; i++){
@@ -552,7 +605,6 @@ public class IntervalTree {
         }
     }
     public static void main(String args[]){
-       testInterval();
-
+        testTuah();
     }
 }
