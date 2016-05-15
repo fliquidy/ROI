@@ -536,6 +536,9 @@ public class IntervalTree {
         leaves[20] = minX - 0.1;
         leaves[21] = maxX + 0.1;
         Arrays.sort(leaves);
+        IntervalTree it = new IntervalTree();
+        it.build(leaves);
+        
         Interval[] intervals = new Interval[20];
         for(int i=0; i < 10; i++){
             intervals[2*i] = new Interval(xs[i]-0.25, xs[i] + 0.25, ys[i] - 0.25, 1, ObjectType.New, EdgeType.Up);
@@ -544,6 +547,11 @@ public class IntervalTree {
         Arrays.sort(intervals);
         for(int i=0; i < 20; i++){
             System.out.println(intervals[i].y);
+        }
+        for(int i=0; i < 20; i++){
+        	if(intervals[i].et == EdgeType.Up){
+        		
+        	}
         }
 
     }

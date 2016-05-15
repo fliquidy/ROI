@@ -1,6 +1,5 @@
 package ROI;
 import org.mapdb.*;
-import sun.awt.image.ImageWatched;
 
 import java.util.HashMap;
 import java.util.LinkedList;
