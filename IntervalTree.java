@@ -17,6 +17,9 @@ public class IntervalTree {
     public double Rl;
     public double Rr;
     public double RDegree;
+    public double maxScore;
+    public double maxXPos;
+    public double maxYPos;
 
     public void build(double[] leaves){
         //build the interval tree.
@@ -45,7 +48,18 @@ public class IntervalTree {
         tree[1].window_y = rightBound;
         tree[1].degree = 0;
     }
-    public void forward(boolean isTop, double l, double r, double weight){
+    public double maxScore(){
+    	return tree[1].maxdegree;
+    }
+    public SpatialObject getMaxPoint(){
+    	SpatialObject so = new SpatialObject();
+    	so._weight = tree[1].maxdegree;
+    	int targetIdx = tree[1].targetIdx;
+    	so._x = maxXPos; 
+    	so._y = maxYPos;
+    	return so;
+    }
+    public void forward(boolean isTop, double l, double r, double weight, double y){
         int vnIdx = 1;
         while(tree[vnIdx].discriminant > r || tree[vnIdx].discriminant < l){
           //  System.out.println("vnIdx="+vnIdx);
@@ -72,10 +86,11 @@ public class IntervalTree {
         lvnIdx = 0 - lvnIdx;
         rvnIdx = 0 - rvnIdx;
 //        System.out.println("backward:"+vnIdx + " "+lvnIdx + " "+rvnIdx);
-        backward(vnIdx, lvnIdx, rvnIdx);
+        backward(vnIdx, lvnIdx, rvnIdx, y);
 //        System.out.println("processed");
+
     }
-    public void backward(int vnIdx, int lcIdx, int rcIdx){
+    public void backward(int vnIdx, int lcIdx, int rcIdx, double y){
         while(lcIdx != vnIdx){
             //System.out.println(lcIdx+" "+vnIdx);
             tree[lcIdx].maxdegree = 0;
@@ -94,7 +109,7 @@ public class IntervalTree {
                 tree[lcIdx].maxdegree = tree[rc].maxdegree;
                 tree[lcIdx].targetIdx = tree[rc].targetIdx;
             }
-            System.out.println("backward: nodeIdx: "+lcIdx+", maxD: "+tree[lcIdx].maxdegree+", target: "+tree[lcIdx].targetIdx);
+            //System.out.println("backward: nodeIdx: "+lcIdx+", maxD: "+tree[lcIdx].maxdegree+", target: "+tree[lcIdx].targetIdx);
             lcIdx = lcIdx / 2;
         }
         while(rcIdx != vnIdx) {
@@ -115,7 +130,7 @@ public class IntervalTree {
                 tree[rcIdx].targetIdx = tree[rc].targetIdx;
             }
             rcIdx = rcIdx / 2;
-            System.out.println("backward: nodeIdx: "+rcIdx+", maxD: "+tree[rcIdx].maxdegree+", target: "+tree[rcIdx].targetIdx);
+            //System.out.println("backward: nodeIdx: "+rcIdx+", maxD: "+tree[rcIdx].maxdegree+", target: "+tree[rcIdx].targetIdx);
         }
         while(vnIdx > 0){
             tree[vnIdx].maxdegree = 0;
@@ -135,8 +150,14 @@ public class IntervalTree {
                 tree[vnIdx].targetIdx = tree[rc].targetIdx;
             }
 
-            System.out.println("backward: nodeIdx: "+vnIdx+", maxD: "+tree[vnIdx].maxdegree+", target: "+tree[vnIdx].targetIdx);
+            //System.out.println("backward: nodeIdx: "+vnIdx+", maxD: "+tree[vnIdx].maxdegree+", target: "+tree[vnIdx].targetIdx);
             vnIdx = vnIdx / 2;
+        }
+        if(tree[1].maxdegree > maxScore){
+        	maxScore = tree[1].maxdegree;
+        	int targetIdx = tree[1].targetIdx;
+        	maxXPos = (tree[targetIdx].window_x + tree[targetIdx].window_y) / 2;
+        	maxYPos = y;
         }
 
     }
@@ -166,7 +187,7 @@ public class IntervalTree {
  //       System.out.println("propogated");
         if(tree[nodeIdx].attachedWindow){
             //window attached. Check whether the attached window should be split.
-            System.out.println("nodeIDx: "+nodeIdx+" [x,y]: "+tree[nodeIdx].window_x+","+tree[nodeIdx].window_y+" [l,r]: "+l+","+r);
+            //System.out.println("nodeIDx: "+nodeIdx+" [x,y]: "+tree[nodeIdx].window_x+","+tree[nodeIdx].window_y+" [l,r]: "+l+","+r);
             if(tree[nodeIdx].window_x <= l && tree[nodeIdx].window_y >= r){
                 //new interval is contained in the window
 //                System.out.println("branch 1");
@@ -300,7 +321,7 @@ public class IntervalTree {
         }
         tree[nodeIdx].excess = 0;
         if(tree[nodeIdx].attachedWindow){
-            System.out.println("FL: nodeIdx: "+nodeIdx+" [x,y]: "+tree[nodeIdx].window_x+", "+tree[nodeIdx].window_y+", [l,r]: "+l+", "+r);
+            //System.out.println("FL: nodeIdx: "+nodeIdx+" [x,y]: "+tree[nodeIdx].window_x+", "+tree[nodeIdx].window_y+", [l,r]: "+l+", "+r);
             if(tree[nodeIdx].window_x >= l && tree[nodeIdx].window_y <= r){
                 if(isTop){
                     tree[nodeIdx].degree += degree;
@@ -409,7 +430,7 @@ public class IntervalTree {
         }
         tree[nodeIdx].excess = 0;
         if(tree[nodeIdx].attachedWindow){
-            System.out.println("FR: nodeIdx: "+nodeIdx+" [x,y]: "+tree[nodeIdx].window_x+", "+tree[nodeIdx].window_y+", [l,r]: "+l+", "+r);
+//            System.out.println("FR: nodeIdx: "+nodeIdx+" [x,y]: "+tree[nodeIdx].window_x+", "+tree[nodeIdx].window_y+", [l,r]: "+l+", "+r);
             if(tree[nodeIdx].window_x >= l && tree[nodeIdx].window_y <= r){
                 if(isTop){
                     tree[nodeIdx].degree += degree;
@@ -442,7 +463,7 @@ public class IntervalTree {
                     tree[nodeIdx].degree += degree;
                 }
             }
-            System.out.println("FR: nodeIdx: "+nodeIdx+" [x,y]: "+tree[nodeIdx].window_x+", "+tree[nodeIdx].window_y+", [l,r]: "+l+", "+r);
+ //           System.out.println("FR: nodeIdx: "+nodeIdx+" [x,y]: "+tree[nodeIdx].window_x+", "+tree[nodeIdx].window_y+", [l,r]: "+l+", "+r);
         }
         else{
             if(hasLWindow && tree[nodeIdx].discriminant > Ll && tree[nodeIdx].discriminant < Lr){
@@ -495,9 +516,47 @@ public class IntervalTree {
             }
         }
     }
+    public void search(double[] xs, double[] ys, double[] weights, double a, double b){
+    	double leaves[] = new double[xs.length * 2 + 2];
+    	double minX = xs[0];
+    	double maxX = xs[0];
+    	for(int idx = 0; idx < xs.length; idx++){
+    		leaves[idx * 2] = xs[idx] - b/2;
+    		leaves[idx * 2 + 1] = xs[idx] + b/2;
+    		if(leaves[idx* 2] < minX){
+    			minX = leaves[idx*2];
+    		}
+    		if(leaves[idx*2+1] > maxX){
+    			maxX = leaves[idx*2 + 1];
+    		}
+    	}
+    	leaves[xs.length * 2] = minX;
+    	leaves[xs.length * 2 + 1] = maxX;
+    	Arrays.sort(leaves);
+    	build(leaves);
+        Interval[] intervals = new Interval[xs.length * 2];
+        for(int i=0; i < xs.length; i++){
+            intervals[2*i] = new Interval(xs[i]-b/2, xs[i] + b/2, ys[i] - a/2, weights[i], ObjectType.New, EdgeType.Up);
+            intervals[2* i + 1] = new Interval(xs[i] - b/2, xs[i] + b/2, ys[i] + a/2, weights[i], ObjectType.New, EdgeType.Down);
+        }
+        Arrays.sort(intervals);
+        for(int i=0; i < intervals.length; i++){
+        	if(intervals[i].et == EdgeType.Up){
+        		forward(true, intervals[i].l, intervals[i].r, intervals[i].value, intervals[i].y);
+        	}
+        	else{
+        		forward(false,  intervals[i].l, intervals[i].r, intervals[i].value, intervals[i].y);
+        	}
+        	System.out.println(maxScore+" (" + maxXPos +", "+ maxYPos+")");
+        }
+    }
     public static void testTuah(){
         double[] xs = new double[10];
         double[] ys = new double[10];
+        double[] ws = new double[10];
+        for(int i=0; i<10; i++){
+        	ws[i] = 1;
+        }
         xs[0] = 0.7332764052899778;
         xs[1] = 0.4323687715914065;
         xs[2] = 0.1327378978953987;
@@ -520,40 +579,9 @@ public class IntervalTree {
         ys[8] =  0.8587223635178663;
         ys[9] =  0.11515839130071759;
 
-        double[] leaves = new double[22];
-        double minX = xs[0];
-        double maxX = xs[0];
-        for(int i=0; i < 10; i++){
-            leaves[2 * i] = xs[i] - 0.25;
-            leaves[2 * i + 1] = xs[i] + 0.25;
-            if(xs[i] - 0.25 < minX){
-                minX = xs[i] - 0.25;
-            }
-            if(xs[i] + 0.25 > maxX){
-                maxX = xs[i] + 0.25;
-            }
-        }
-        leaves[20] = minX - 0.1;
-        leaves[21] = maxX + 0.1;
-        Arrays.sort(leaves);
-        IntervalTree it = new IntervalTree();
-        it.build(leaves);
         
-        Interval[] intervals = new Interval[20];
-        for(int i=0; i < 10; i++){
-            intervals[2*i] = new Interval(xs[i]-0.25, xs[i] + 0.25, ys[i] - 0.25, 1, ObjectType.New, EdgeType.Up);
-            intervals[2* i + 1] = new Interval(xs[i] - 0.25, xs[i] + 0.25, ys[i] + 0.25, 1, ObjectType.New, EdgeType.Down);
-        }
-        Arrays.sort(intervals);
-        for(int i=0; i < 20; i++){
-            System.out.println(intervals[i].y);
-        }
-        for(int i=0; i < 20; i++){
-        	if(intervals[i].et == EdgeType.Up){
-        		
-        	}
-        }
-
+        IntervalTree it = new IntervalTree();
+        it.search(xs, ys, ws, 0.5, 0.5);
     }
     public static void testInterval(){
         double[] leaves = new double[10];
@@ -603,7 +631,7 @@ public class IntervalTree {
         top[7] = false;
 
         for(int i=0; i < 8; i++){
-            it.forward(top[i], x[i], y[i], 1.0);
+            it.forward(top[i], x[i], y[i], 1.0, 1);
             System.out.println("processing "+x[i]+" "+y[i]+" "+top[i]);
             System.out.println("current best result: ["+it.tree[it.tree[1].targetIdx].window_x+", "+it.tree[it.tree[1].targetIdx].window_y+"] "+it.tree[1].maxdegree);
             for(int j=1; j < it.tree.length; j++){
