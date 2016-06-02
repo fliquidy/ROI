@@ -93,14 +93,19 @@ public class MemIndex {
     public void searchCell(Cell c){
         TwoWindowLists tl = exactIndex.get(c);
         int objectNum = tl.size();
+        Interval[] intervals = new Interval[objectNum];
         double[] coords = new double[objectNum];
         for(int idx = 0; idx < tl.pastWindow.size(); idx ++){
             coords[idx] = tl.pastWindow.get(idx)._x;
+            intervals[idx] = new Interval()
         }
         for(int idx = 0; idx < tl.currentWindow.size(); idx++){
             coords[idx + tl.pastWindow.size()] = tl.currentWindow.get(idx)._x;
         }
         BurstInterval bi = new BurstInterval(coords);
+
+
+
 
     }
 }

@@ -88,6 +88,10 @@ public class IntervalTree {
 //        System.out.println("backward:"+vnIdx + " "+lvnIdx + " "+rvnIdx);
         backward(vnIdx, lvnIdx, rvnIdx, y);
 //        System.out.println("processed");
+        for(int idx = 1; idx < tree.length; idx++){
+            System.out.print(idx+" ("+tree[idx].window_x+","+tree[idx].window_y+"): "+tree[idx].degree+" "+tree[idx].excess+" "+tree[idx].targetIdx+" "+tree[idx].maxdegree+" ## ");
+        }
+        System.out.println();
 
     }
     public void backward(int vnIdx, int lcIdx, int rcIdx, double y){
