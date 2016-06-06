@@ -14,6 +14,9 @@ public class Interval implements Comparable<Interval>{
         this.l = lcoord;
         this.r = rcoord;
         this.y = ycoord;
+        value = weight;
+        ot = objt;
+        et = edget;
         
     }
     public int compareTo(Interval it){

@@ -6,10 +6,11 @@ import org.mapdb.*;
 /**
  * Created by kaiyu on 5/8/2016.
  */
-public class MemIndex {
+public class  MemIndex {
     //best result
     public boolean updatedResult;
     public SpatialObject maxPosition;
+    public boolean isValid;
 
     //index and upperbounds
     public UpperboundManager ubm;
@@ -56,6 +57,49 @@ public class MemIndex {
         l.addAll(tl.currentWindow);
         return l;
     }
+
+    public void processObject(SpatialObject o, Cell c){
+        //process cells which are affected by object and are maintained in memory.
+    }
+
+    public Point searchCell(Cell c, double a, double b){
+        TwoWindowLists tl = exactIndex.get(c);
+        int objectNum = tl.size();
+        LinkedList<Interval> intervals = tl.getIntervals(a, b);
+        double[] coords = tl.getXCoords(b);
+        BurstInterval bi = new BurstInterval(coords);
+        Iterator<Interval> it = intervals.listIterator();
+        Interval current = null;
+        if(it.hasNext())
+            current = it.next();
+        while(it.hasNext()){
+            Interval next = it.next();
+            bi.insertInterval(current, next.y);
+            current = next;
+        }
+        bi.insertInterval(current, current.y+1.0);
+        Point p = new Point(bi.maxX, bi.maxY, bi.maxScore);
+        if((!isValid) || (bi.maxScore > maxPosition._weight)){
+            maxPosition._weight = bi.maxScore;
+            maxPosition._x = bi.maxX;
+            maxPosition._y = bi.maxY;
+        }
+        return p;
+    }
+
+    /*******************************************/
+
+    public boolean search(double a, double b){
+        /*search all cells whose upper bound is larger than the current result.
+        return true if current result is updated, and false otherwise
+        */
+        while(ubm.getMax() > maxPosition._weight){
+            Cell c = ubm.getMaxUB().c;
+            Point p = searchCell(c, a, b);
+
+        }
+        return false;
+    }
     public void insertIntoIndex(SpatialObject o, Cell c, ObjectType t){
         //add into index, update upper bounds.
         if(exactIndex.containsKey(c)){
@@ -83,29 +127,5 @@ public class MemIndex {
         else{
             System.err.println("Cell "+c.toString()+" is not in memory.");
         }
-    }
-    public void processObject(SpatialObject o, Cell c){
-        //process cells which are affected by object and are maintained in memory.
-    }
-    public void search(){
-
-    }
-    public void searchCell(Cell c){
-        TwoWindowLists tl = exactIndex.get(c);
-        int objectNum = tl.size();
-        Interval[] intervals = new Interval[objectNum];
-        double[] coords = new double[objectNum];
-        for(int idx = 0; idx < tl.pastWindow.size(); idx ++){
-            coords[idx] = tl.pastWindow.get(idx)._x;
-            intervals[idx] = new Interval()
-        }
-        for(int idx = 0; idx < tl.currentWindow.size(); idx++){
-            coords[idx + tl.pastWindow.size()] = tl.currentWindow.get(idx)._x;
-        }
-        BurstInterval bi = new BurstInterval(coords);
-
-
-
-
     }
 }

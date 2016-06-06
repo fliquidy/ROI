@@ -20,8 +20,9 @@ public class UpperboundManager {
         myheap.add(ub);
     }
     public double getUB(Cell c){
-        return myheap.get(mymap.get(c)).upperbound;
+        return myheap.get(mymap.get(c)).bound.upperBound();
     }
+    public void set(Cell c, double current, double past)
     public void updateUB(Cell c, double value, double time, ObjectType t){
         int idx = 0;
         if(mymap.containsKey(c)){
@@ -64,6 +65,19 @@ public class UpperboundManager {
             myheap.get(1).update(value, time);
         }
         updateHeap(1);
+    }
+    public void updateExactUB(Cell c, double current, double past){
+        int idx = 0;
+        if(mymap.containsKey(c)){
+            idx = mymap.get(c);
+        }
+        else{
+            idx = myheap.size();
+            UpperBound ub = new UpperBound(value, time, c);
+            myheap.add(ub);
+            mymap.put(c, idx);
+        }
+        myheap.get(idx).upperbound = value;
     }
     public void update(Cell c, double value, double time){
         int idx = 0;

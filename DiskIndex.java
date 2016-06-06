@@ -39,6 +39,25 @@ public class DiskIndex {
         return ubm.getMax();
     }
 
+
+    public void flush(){
+        BTreeMap<Cell, LinkedList<SpatialObject>> comap = db.createTreeMap("DCell_object").makeOrGet();
+        for(Cell c:cacheDetails.keySet()){
+            LinkedList<SpatialObject> l = comap.get(c);
+            while((!l.isEmpty()) &&
+                    (StorageManager.currentTime - l.getFirst()._time > StorageManager.validWindow)){
+                l.removeFirst();
+            }
+            l.addAll(cacheDetails.get(c));
+            comap.put(c, l);
+        }
+        db.commit();
+    }
+    public void processObject(SpatialObject o, Cell c){
+        //process cells affected by object o and are maintained in disk
+    }
+
+    /******************************************************/
     public void insertIntoIndex(SpatialObject o, Cell c, ObjectType t){
         if(t == ObjectType.New){
             cacheObj.add(o);
@@ -60,20 +79,5 @@ public class DiskIndex {
         }
 
     }
-    public void flush(){
-        BTreeMap<Cell, LinkedList<SpatialObject>> comap = db.createTreeMap("DCell_object").makeOrGet();
-        for(Cell c:cacheDetails.keySet()){
-            LinkedList<SpatialObject> l = comap.get(c);
-            while((!l.isEmpty()) &&
-                    (StorageManager.currentTime - l.getFirst()._time > StorageManager.validWindow)){
-                l.removeFirst();
-            }
-            l.addAll(cacheDetails.get(c));
-            comap.put(c, l);
-        }
-        db.commit();
-    }
-    public void processObject(SpatialObject o, Cell c){
-        //process cells affected by object o and are maintained in disk
-    }
+
 }

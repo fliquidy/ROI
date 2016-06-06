@@ -148,35 +148,7 @@ public class StorageManager {
 	
 	
 	
-	public void maintainMemIndex(Cell c, SpatialObject o){
-		//Process the case when the affected cell is in memory.
 
-		//Step 1: insert object o into mem.index
-		exactIndex.get(c).add(o);
-
-		//Step 2: update upper bounds for affected cells.
-		MemUM.update(c, o._weight, o._time);
-
-		//Step 3: Check whether need to search for exact result.
-
-		exactIndex.get(c).add(o);
-		memIndexSize += o.size();
-		double old_ub = ubInMem.get(c);
-		if(old_ub + o._weight > smax){
-			//this cell may be a result, find the exact max score in this cell.
-			ExactSolver es = new ExactSolver();
-			double ub = es.find();
-			ubInMem.put(c, ub);
-			if(ub > smax){
-				updateResult(es.x, es.y);
-			}
-		}
-		else{
-			//this cell cannot be a result
-			ubInMem.put(c, old_ub + o._weight);
-		}
-		db.commit();
-	}
 	public void maintainDiskIndex(Cell c, SpatialObject o){
 		//process the case when the affected cell is in disk
 
@@ -211,39 +183,7 @@ public class StorageManager {
 		BTreeMap<Integer, SpatialObject> map = db.createTreeMap("details").makeOrGet();
 		map.put(o._id, o);
 	}
-	public void writeToIndex(SpatialObject o, Type t){
-		if(t == Type.Exact){
-			BTreeMap<Cell, Vector<Integer>> index = db.createTreeMap("ExactIndex").makeOrGet();
-			Cell c = o.locateCell(a, b);
-			Cell cu = c.up();
-			Cell cr = c.right();
-			Cell cur = c.upright();
-			if(cellsInMem.contains(c)){
-				maintainMemIndex(c, o);
-			}
-			else{
-				maintainDiskIndex(c, o);
-			}
-			if(cellsInMem.contains(cu)){
-				maintainMemIndex(cu, o);
-			}
-			else{
-				maintainDiskIndex(cu, o);
-			}
-			if(cellsInMem.contains(cr)){
-				maintainMemIndex(cr, o);
-			}
-			else{
-				maintainDiskIndex(cr, o);
-			}
-			if(cellsInMem.contains(cur)){
-				maintainMemIndex(cur, o);
-			}
-			else{
-				maintainDiskIndex(cur, o);
-			}
-		}
-	}
+
 
 	public double updateUBInDisk(Cell c, SpatialObject o){
 		//update the loose upper bound for the cells in disk
