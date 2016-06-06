@@ -20,31 +20,29 @@ public class UpperboundManager {
         myheap.add(ub);
     }
     public double getUB(Cell c){
-        return myheap.get(mymap.get(c)).bound.upperBound();
+        return myheap.get(mymap.get(c))._bound.upperBound();
     }
-    public void set(Cell c, double current, double past)
-    public void updateUB(Cell c, double value, double time, ObjectType t){
+    public void set(Cell c, double current, double past){
+
+    }
+    public void updateUBforCell(Cell c, SpatialObject o, ObjectType ot){
         int idx = 0;
         if(mymap.containsKey(c)){
             idx = mymap.get(c);
         }
         else{
            idx = myheap.size();
-            UpperBound ub = new UpperBound(value, time, c);
+            UpperBound ub = new UpperBound();
             myheap.add(ub);
             mymap.put(c, idx);
         }
-        if(t == ObjectType.Old){
-            myheap.get(idx).updatePastUB(value);
-        }
-        else if(t == ObjectType.New){
-            myheap.get(idx).updateCurrentUB(value);
-        }
-        else{
-            System.err.println("Wrong type");
-        }
+        myheap.get(idx)._bound.update(o, ot);
         updateHeap(idx);
     }
+    public void updateCell(Cell c, UpperBound ub){
+        
+    }
+
     public void updateCellUB(Cell oldC, Cell newC, double value, double time){
         int idx = mymap.get(oldC);
         if(time > 0){
@@ -155,6 +153,7 @@ public class UpperboundManager {
             }
         }
     }
+
     public void print(){
         for(int i=1; i < myheap.size(); i++){
             System.out.print("["+myheap.get(i).c.toString()+", "+myheap.get(i).upperbound+"] ");
@@ -184,5 +183,6 @@ public class UpperboundManager {
         um.update(c[0], 6, 6);
         um.print();
     }
+
 
 }

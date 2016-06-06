@@ -51,18 +51,14 @@ public class  MemIndex {
     public void remove(Cell c){
         exactIndex.remove(c);
     }
-    public LinkedList<SpatialObject> retrieve(Cell c){
-        TwoWindowLists tl = exactIndex.get(c);
-        LinkedList<SpatialObject> l = new LinkedList<>(tl.pastWindow);
-        l.addAll(tl.currentWindow);
-        return l;
-    }
+
 
     public void processObject(SpatialObject o, Cell c){
         //process cells which are affected by object and are maintained in memory.
     }
 
-    public Point searchCell(Cell c, double a, double b){
+    public void searchCell(double a, double b, UpperBound ub){
+        Cell c = ub._c;
         TwoWindowLists tl = exactIndex.get(c);
         int objectNum = tl.size();
         LinkedList<Interval> intervals = tl.getIntervals(a, b);
@@ -84,7 +80,10 @@ public class  MemIndex {
             maxPosition._x = bi.maxX;
             maxPosition._y = bi.maxY;
         }
-        return p;
+        ub._bound.setHotUB(bi.maxScore);
+        ub._bound.setExact(true);
+        ub._bound.setColdUB(tl._currentSum, tl._pastSum);
+        ub._p = p;
     }
 
     /*******************************************/
@@ -94,8 +93,9 @@ public class  MemIndex {
         return true if current result is updated, and false otherwise
         */
         while(ubm.getMax() > maxPosition._weight){
-            Cell c = ubm.getMaxUB().c;
-            Point p = searchCell(c, a, b);
+            UpperBound ub = ubm.getMaxUB();
+            searchCell(a, b, ub);
+
 
         }
         return false;

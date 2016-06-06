@@ -48,7 +48,7 @@ public class StorageManager {
 		}
 
 		while(maintainIndex(memIdx, diskIdx)){
-			memIdx.search();
+			//memIdx.search();
 		}
 
 	}

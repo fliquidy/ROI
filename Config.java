@@ -1,15 +1,22 @@
 package ROI;
 
 public class Config {
-	public int cacheSize;
-	public int cellsInMemoryConstraint;
-	public int ubInRestCellsCount;
+	public static double _currentWindow;
+	public static double _pastWindow;
+
+	public static double _a;
+	public static double _b;
+
 	public Config(){
 		
 	}
-	public Config(Config c){
-		this.cacheSize = c.cacheSize;
-		this.cellsInMemoryConstraint = c.cellsInMemoryConstraint;
-		this.ubInRestCellsCount = c.ubInRestCellsCount;
+	public void setWindow(double cWindow, double pWindow){
+		_currentWindow = cWindow;
+		_pastWindow = pWindow;
+	}
+
+	public void setRecSize(double a, double b){
+		_a = a;
+		_b = b;
 	}
 }

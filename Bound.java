@@ -6,26 +6,60 @@ package ROI;
 public class Bound {
     double _currentValue;
     double _pastValue;
-    boolean isValid;
-    public Bound(){set(0, 0);}
-    public Bound(double currentValue, double pastValue){
-        set(currentValue, pastValue);
+    double _upperbound;
+    boolean _exact;
+    public Bound(){
+        setColdUB(0, 0);
+        setHotUB(0);
     }
     public double upperBound(){
-        return _currentValue + _currentValue > _pastValue?_currentValue:_pastValue;
+        double coldUB = _currentValue + _currentValue > _pastValue?_currentValue:_pastValue;
+        return coldUB > _upperbound?_upperbound:coldUB;
     }
-    public boolean valid(){return isValid;}
-    public void set(double current, double past){
+    public boolean isExact(){
+        return _exact;
+    }
+
+    public void setColdUB(double current, double past){
         _currentValue = current;
         _pastValue = past;
     }
-    public void setValid(boolean valid){
-        isValid = valid;
+    public void setHotUB(double ub){
+        _upperbound = ub;
     }
-    public void addCurrent(double current){
-        _currentValue += current;
+
+    public void setExact(boolean exact){
+        _exact = exact;
     }
-    public void addPast(double past){
-        _pastValue += past;
+
+    public void updateNew(double value){
+        _currentValue += value/Config._currentWindow;
+        _upperbound += value/Config._currentWindow + value/Config._pastWindow;
+    }
+
+    public void updateOld(double value){
+        _currentValue -= value/Config._currentWindow;
+        _pastValue += value/Config._pastWindow;
+        double change = value/Config._pastWindow - value/Config._currentWindow;
+        if(change > 0){
+            _upperbound += change;
+        }
+    }
+
+    public void updateExpired(double value){
+        _pastValue -= value/Config._pastWindow;
+        _upperbound += value/Config._pastWindow;
+    }
+
+    public void update(SpatialObject o, ObjectType ot){
+        switch (ot){
+            case New: updateNew(o._weight);
+                break;
+            case Old: updateOld(o._weight);
+                break;
+            case Expired: updateExpired(o._weight);
+                break;
+        }
+        _exact = false;
     }
 }

@@ -4,37 +4,33 @@ package ROI;
  * Created by kaiyu on 5/4/2016.
  */
 public class UpperBound {
-    public Bound bound;
-    public Point p;
-    public boolean isExact;
-    public Cell c;
-    public UpperBound(double current, double past, Cell cell){
-        bound = new Bound(current, past);
-        c = new Cell(cell);
-
-    }
+    public Bound _bound;
+    public Point _p;
+    public boolean _isExact;
+    public Cell _c;
     public UpperBound(){
-        bound = new Bound();
-        isExact = false;
+        init();
     }
-    public void updateCurrentUB(double ub){
-        bound.addCurrent(ub);
-        isExact = false;
+    public UpperBound(Cell c){
+        init();
+        _c = new Cell(c);
     }
-    public void updatePastUB(double ub){
-        bound.addPast(ub);
-        isExact = false;
+    public void init(){
+        _bound = new Bound();
+        _p = null;
+        _isExact = false;
+        _c = null;
     }
-    public void updateExactUB(double current, double past){
-        bound.set(current, past);
-        isExact = true;
+    public void setCell(Cell newCell){
+        _c = new Cell(newCell);
     }
-    public void set(Cell newCell, double current, double past){
-        c = new Cell(newCell);
-        bound.set(current, past);
+    public void setBound(double currentValue, double pastValue, double upperbound){
+        _bound.setHotUB(upperbound);
+        _bound.setColdUB(currentValue, pastValue);
     }
-    public UpperBound copy(){
-        return new UpperBound(bound._currentValue, bound._pastValue, c);
+    public void setPoint(double x, double y){
+        _p._x = x;
+        _p._y = y;
     }
 
 }
