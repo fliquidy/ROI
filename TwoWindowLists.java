@@ -26,12 +26,22 @@ public class TwoWindowLists {
         _pastWindow.removeFirst();
 
     }
-    public void transform(double value){
+    public void transform(){
         SpatialObject o = _currentWindow.getFirst();
         _pastWindow.addLast(o);
         _currentWindow.removeFirst();
         _currentSum -= o._weight/Config._currentWindow;
         _pastSum += o._weight/Config._pastWindow;
+    }
+    public void addObject(SpatialObject o, ObjectType ot){
+        switch(ot){
+            case New: add(o);
+                break;
+            case Old: transform();
+                break;
+            case Expired: remove();
+                break;
+        }
     }
     public int size(){
         return _currentWindow.size() + _pastWindow.size();
