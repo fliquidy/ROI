@@ -40,7 +40,7 @@ public class UpperboundManager {
         updateHeap(idx);
     }
     public void updateCell(Cell c, UpperBound ub){
-        
+
     }
 
     public void updateCellUB(Cell oldC, Cell newC, double value, double time){
