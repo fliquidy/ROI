@@ -50,78 +50,24 @@ public class UpperboundManager {
         updateHeap(idx);
     }
 
-    public void updateCellUB(Cell oldC, Cell newC, double value, double time){
-        int idx = mymap.get(oldC);
-        if(time > 0){
-            myheap.get(idx).update(newC, value, time);
-        }
-        else{
-            myheap.get(idx).update(newC, value);
-        }
-        updateHeap(idx);
-    }
-    public void updateMax(Cell c, double value, double time){
-        mymap.remove(myheap.get(1).c);
-        mymap.put(c, 1);
-        if(time > 0){
-            myheap.get(1).update(value);
-        }
-        else{
-            myheap.get(1).update(value, time);
-        }
-        updateHeap(1);
-    }
-    public void updateExactUB(Cell c, double current, double past){
-        int idx = 0;
-        if(mymap.containsKey(c)){
-            idx = mymap.get(c);
-        }
-        else{
-            idx = myheap.size();
-            UpperBound ub = new UpperBound(value, time, c);
-            myheap.add(ub);
-            mymap.put(c, idx);
-        }
-        myheap.get(idx).upperbound = value;
-    }
-    public void update(Cell c, double value, double time){
-        int idx = 0;
-        if(mymap.containsKey(c)){
-            idx = mymap.get(c);
-        }
-        else{
-           idx = myheap.size();
-            UpperBound ub = new UpperBound(value, time, c);
-            myheap.add(ub);
-            mymap.put(c, idx);
-        }
-        if(time > 0){
-            myheap.get(idx).update(value);
-        }
-        else {
-            myheap.get(idx).update(value, time);
-        }
-        updateHeap(idx);
-    }
-
     public double getMax(){
         if(myheap.isEmpty()){
             return -1.0;
         }
-        return myheap.get(1).upperbound;
+        return myheap.get(1).upperBound();
     }
     public UpperBound getMaxUB(){
         if(myheap.size()<2){
             return null;
         }
-        return myheap.get(1).copy();
+        return myheap.get(1);
     }
 
     private void updateHeap(int index){
         int father = index/2;
         int lchild = index * 2;
         int rchild = index * 2 + 1;
-        System.out.println("processing "+index+", "+myheap.get(index).upperBound();
+        System.out.println("processing "+index+", "+myheap.get(index).upperBound());
         if(father > 0 && myheap.get(father).upperBound() < myheap.get(index).upperBound()){
             //move upwards
             while(father > 0 && myheap.get(father).upperBound() < myheap.get(index).upperBound()){
@@ -153,7 +99,7 @@ public class UpperboundManager {
                 myheap.set(swapIdx, myheap.get(index));
                 myheap.set(index, tmp);
                 mymap.put(myheap.get(index)._c, index);
-                mymap.put(myheap.get(swapIdx)._ c, swapIdx);
+                mymap.put(myheap.get(swapIdx)._c, swapIdx);
                 index = index * 2;
                 lchild = index * 2;
                 rchild = index * 2 + 1;
@@ -163,32 +109,12 @@ public class UpperboundManager {
 
     public void print(){
         for(int i=1; i < myheap.size(); i++){
-            System.out.print("["+myheap.get(i).c.toString()+", "+myheap.get(i).upperbound+"] ");
+            System.out.print("["+myheap.get(i)._c.toString()+", "+myheap.get(i).upperBound()+"] ");
         }
         System.out.println();
     }
     public static void main(String args[]){
-        UpperboundManager um = new UpperboundManager(5);
-        Cell[] c = new Cell[5];
-        for(int i=0; i < 5; i++){
-            c[i] = new Cell(i, i);
-            um.update(c[i], i, i);
-        }
-        um.print();
-        um.update(c[1], 5, 5);
-        um.print();
-        System.out.println("#################");
-        um.update(c[3], 2, 2);
-        um.print();
-        System.out.println("#################");
-        um.update(c[0], 4, 4);
-        um.print();
-        System.out.println("#################");
-        um.update(c[0], 0, 0);
-        um.print();
-        System.out.println("#################");
-        um.update(c[0], 6, 6);
-        um.print();
+
     }
 
 

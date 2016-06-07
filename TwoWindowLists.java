@@ -43,10 +43,18 @@ public class TwoWindowLists {
                 break;
         }
     }
+    public int mostRecentTime(){
+        return _currentWindow.getLast()._time;
+    }
     public int size(){
         return _currentWindow.size() + _pastWindow.size();
     }
-
+    public LinkedList<SpatialObject> getListOfSpatialObject(){
+        LinkedList<SpatialObject> list = new LinkedList<>();
+        list.addAll(_pastWindow);
+        list.addAll(_currentWindow);
+        return list;
+    }
     public LinkedList<Interval> getIntervals(double a, double b) {
         LinkedList<Interval> list = new LinkedList<>();
         for (SpatialObject o : _pastWindow) {
@@ -105,7 +113,7 @@ public class TwoWindowLists {
         tl.print();
         tl.add(new SpatialObject(2, 2, 2, 2.0, 2.0, 2.0));
         tl.print();
-        tl.transform(0.5);
+        tl.transform();
         tl.print();
         double[] xcoords = tl.getXCoords(0.5);
         Config c = new Config();

@@ -7,6 +7,8 @@ public class Config {
 	public static double _a;
 	public static double _b;
 
+	public static double _cacheConstraint;
+
 	public Config(){
 		
 	}

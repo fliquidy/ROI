@@ -14,36 +14,20 @@ public class  MemIndex {
 
     //index and upperbounds
     public UpperboundManager ubm;
-    public UpperboundManager ubmin;
     public HashMap<Cell, TwoWindowLists> exactIndex;
 
     public MemIndex(){
         ubm = new UpperboundManager();
-        ubmin = new UpperboundManager();
         exactIndex = new HashMap<>();
-    }
-    public void setUB(Cell oldc, Cell newc, double value, double time){
-        ubm.updateCellUB(oldc, newc, value, time);
-        ubmin.updateCellUB(oldc, newc, value, time);
-    }
-    public void increaseUB(Cell c, double value, double time, ObjectType t){
-        ubm.updateUB(c, value, time, t);
-        ubmin.updateUB(c, 0-value, time, t);
-    }
-    public UpperBound getMin(){
-        return ubmin.getMaxUB();
-    }
-    public double minUB(){
-        return 0 - ubmin.getMax();
     }
     public void write(Cell c, LinkedList<SpatialObject> l){
         TwoWindowLists tl = new TwoWindowLists();
         for(SpatialObject o : l){
             if(StorageManager.currentTime - o._time >= StorageManager.currentWindow){
-                tl.pastWindow.addLast(o);
+                tl._pastWindow.addLast(o);
             }
             else{
-                tl.currentWindow.addLast(o);
+                tl._currentWindow.addLast(o);
             }
         }
         exactIndex.put(c, tl);
@@ -107,6 +91,9 @@ public class  MemIndex {
         }
         else{
             System.err.println("Cell "+c.toString()+" is not in memory.");
+        }
+        if(o.locateCell(Config._a, Config._b).equals(maxPosition.locateCell(Config._a, Config._b))){
+            isValid = false;
         }
     }
 }
