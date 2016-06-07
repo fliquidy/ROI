@@ -40,7 +40,13 @@ public class UpperboundManager {
         updateHeap(idx);
     }
     public void updateCell(Cell c, UpperBound ub){
-        
+        if(!mymap.containsKey(c)){
+            System.err.println("Cell ("+c._x+", "+c._y+") is not in UpperBoundManager");
+            System.exit(0);
+        }
+        int idx = mymap.get(c);
+        myheap.get(idx).copy(ub);
+        updateHeap(idx);
     }
 
     public void updateCellUB(Cell oldC, Cell newC, double value, double time){
@@ -114,39 +120,39 @@ public class UpperboundManager {
         int father = index/2;
         int lchild = index * 2;
         int rchild = index * 2 + 1;
-        System.out.println("processing "+index+", "+myheap.get(index).upperbound);
-        if(father > 0 && myheap.get(father).upperbound < myheap.get(index).upperbound){
+        System.out.println("processing "+index+", "+myheap.get(index).upperBound();
+        if(father > 0 && myheap.get(father).upperBound() < myheap.get(index).upperBound()){
             //move upwards
-            while(father > 0 && myheap.get(father).upperbound < myheap.get(index).upperbound){
+            while(father > 0 && myheap.get(father).upperBound() < myheap.get(index).upperBound()){
                 UpperBound tmp = myheap.get(index);
                 myheap.set(index, myheap.get(father));
                 myheap.set(father, tmp);
-                mymap.put(myheap.get(index).c, index);
-                mymap.put(myheap.get(father).c, father);
+                mymap.put(myheap.get(index)._c, index);
+                mymap.put(myheap.get(father)._c, father);
                 father = father / 2;
                 index = index / 2;
             }
         }
-        else if((lchild < myheap.size() && myheap.get(lchild).upperbound > myheap.get(index).upperbound)
-                ||(rchild < myheap.size() && myheap.get(rchild).upperbound > myheap.get(index).upperbound)
+        else if((lchild < myheap.size() && myheap.get(lchild).upperBound() > myheap.get(index).upperBound())
+                ||(rchild < myheap.size() && myheap.get(rchild).upperBound() > myheap.get(index).upperBound())
                 ){
                 //move downwards
             while(lchild < myheap.size()){
                 int swapIdx = 0;
                 if(rchild < myheap.size()){
-                   swapIdx = myheap.get(lchild).upperbound > myheap.get(rchild).upperbound ? lchild : rchild;
+                   swapIdx = myheap.get(lchild).upperBound() > myheap.get(rchild).upperBound() ? lchild : rchild;
                 }
                 else{
                     swapIdx = lchild;
                 }
-                if(myheap.get(swapIdx).upperbound <= myheap.get(index).upperbound){
+                if(myheap.get(swapIdx).upperBound() <= myheap.get(index).upperBound()){
                     break;
                 }
                 UpperBound tmp = myheap.get(swapIdx);
                 myheap.set(swapIdx, myheap.get(index));
                 myheap.set(index, tmp);
-                mymap.put(myheap.get(index).c, index);
-                mymap.put(myheap.get(swapIdx).c, swapIdx);
+                mymap.put(myheap.get(index)._c, index);
+                mymap.put(myheap.get(swapIdx)._ c, swapIdx);
                 index = index * 2;
                 lchild = index * 2;
                 rchild = index * 2 + 1;

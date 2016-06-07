@@ -79,6 +79,7 @@ public class  MemIndex {
             maxPosition._weight = bi.maxScore;
             maxPosition._x = bi.maxX;
             maxPosition._y = bi.maxY;
+            updatedResult = true;
         }
         ub._bound.setHotUB(bi.maxScore);
         ub._bound.setExact(true);
@@ -88,41 +89,21 @@ public class  MemIndex {
 
     /*******************************************/
 
-    public boolean search(double a, double b){
+    public void search(double a, double b){
         /*search all cells whose upper bound is larger than the current result.
         return true if current result is updated, and false otherwise
         */
+        updatedResult = false;
         while(ubm.getMax() > maxPosition._weight){
             UpperBound ub = ubm.getMaxUB();
             searchCell(a, b, ub);
-
-
         }
-        return false;
     }
     public void insertIntoIndex(SpatialObject o, Cell c, ObjectType t){
         //add into index, update upper bounds.
         if(exactIndex.containsKey(c)){
-            if(t == ObjectType.New) {
-                //add to index
-                exactIndex.get(c).add(o);
-                //ubm.updateUB(c, o._weight/StorageManager.currentWindow, -1, ObjectType.New);
-                increaseUB(c, o._weight/StorageManager.currentTime, -1, ObjectType.New);
-            }
-            else if(t == ObjectType.Old){
-                //update weight
-                exactIndex.get(c).transform(o._weight/StorageManager.pastWindow);
-//                ubm.updateUB(c, 0 - o._weight/StorageManager.currentWindow, -1, ObjectType.New);
-//                ubm.updateUB(c, o._weight/StorageManager.pastWindow, -1, ObjectType.Old);
-                increaseUB(c, 0-o._weight/StorageManager.currentTime, -1, ObjectType.New);
-                increaseUB(c, o._weight/StorageManager.pastWindow, -1, ObjectType.Old);
-            }
-            else {
-                //remove from index, doesn't affect the upper bound
-//                ubm.updateUB(c, 0 - o._weight/StorageManager.pastWindow, -1, ObjectType.Old);
-                increaseUB(c, 0 - o._weight/StorageManager.pastWindow, -1, ObjectType.Old);
-                exactIndex.get(c).remove();
-            }
+            exactIndex.get(c).addObject(o, t);
+            ubm.updateUBforCell(c, o, t);
         }
         else{
             System.err.println("Cell "+c.toString()+" is not in memory.");
