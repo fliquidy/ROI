@@ -1,39 +1,26 @@
 package ROI;
-import java.io.File;
 import java.util.*;
 import java.util.LinkedList;
-import org.mapdb.*;
+
 /**
  * Created by kaiyu on 5/8/2016.
  */
 public class  MemIndex {
     //best result
-    public boolean updatedResult;
-    public SpatialObject maxPosition;
-    public boolean isValid;
+    public boolean _updatedResult;
+    public SpatialObject _maxPosition;
+    public boolean _isValid;
 
     //index and upperbounds
-    public UpperboundManager ubm;
-    public HashMap<Cell, TwoWindowLists> exactIndex;
+    public MemUBM _ubm;
+    public HashMap<Cell, TwoWindowLists> _exactIndex;
 
     public MemIndex(){
-        ubm = new UpperboundManager();
-        exactIndex = new HashMap<>();
-    }
-    public void write(Cell c, LinkedList<SpatialObject> l){
-        TwoWindowLists tl = new TwoWindowLists();
-        for(SpatialObject o : l){
-            if(StorageManager.currentTime - o._time >= StorageManager.currentWindow){
-                tl._pastWindow.addLast(o);
-            }
-            else{
-                tl._currentWindow.addLast(o);
-            }
-        }
-        exactIndex.put(c, tl);
+        _ubm = new MemUBM();
+        _exactIndex = new HashMap<>();
     }
     public void remove(Cell c){
-        exactIndex.remove(c);
+        _exactIndex.remove(c);
     }
 
 
@@ -43,7 +30,7 @@ public class  MemIndex {
 
     public void searchCell(double a, double b, UpperBound ub){
         Cell c = ub._c;
-        TwoWindowLists tl = exactIndex.get(c);
+        TwoWindowLists tl = _exactIndex.get(c);
         int objectNum = tl.size();
         LinkedList<Interval> intervals = tl.getIntervals(a, b);
         double[] coords = tl.getXCoords(b);
@@ -59,11 +46,12 @@ public class  MemIndex {
         }
         bi.insertInterval(current, current.y+1.0);
         Point p = new Point(bi.maxX, bi.maxY, bi.maxScore);
-        if((!isValid) || (bi.maxScore > maxPosition._weight)){
-            maxPosition._weight = bi.maxScore;
-            maxPosition._x = bi.maxX;
-            maxPosition._y = bi.maxY;
-            updatedResult = true;
+        if((!_isValid) || (bi.maxScore > _maxPosition._weight)){
+            _maxPosition._weight = bi.maxScore;
+            _maxPosition._x = bi.maxX;
+            _maxPosition._y = bi.maxY;
+            _updatedResult = true;
+            _isValid = true;
         }
         ub._bound.setHotUB(bi.maxScore);
         ub._bound.setExact(true);
@@ -77,23 +65,34 @@ public class  MemIndex {
         /*search all cells whose upper bound is larger than the current result.
         return true if current result is updated, and false otherwise
         */
-        updatedResult = false;
-        while(ubm.getMax() > maxPosition._weight){
-            UpperBound ub = ubm.getMaxUB();
+        _updatedResult = false;
+        while(_ubm.getMaxUB().upperBound() > _maxPosition._weight || (!_isValid)){
+            UpperBound ub = _ubm.getMaxUB();
             searchCell(a, b, ub);
         }
     }
+    public boolean safeToSkipSearch(){
+        return _isValid && _maxPosition._weight >= _ubm.getMaxUB().upperBound();
+    }
     public void insertIntoIndex(SpatialObject o, Cell c, ObjectType t){
         //add into index, update upper bounds.
-        if(exactIndex.containsKey(c)){
-            exactIndex.get(c).addObject(o, t);
-            ubm.updateUBforCell(c, o, t);
+        if(_exactIndex.containsKey(c)){
+            _exactIndex.get(c).addObject(o, t);
+            _ubm.updateUBforCell(c, o, t);
         }
         else{
             System.err.println("Cell "+c.toString()+" is not in memory.");
         }
-        if(o.locateCell(Config._a, Config._b).equals(maxPosition.locateCell(Config._a, Config._b))){
-            isValid = false;
+        if(o.locateCell(Config._a, Config._b).equals(_maxPosition.locateCell(Config._a, Config._b))){
+            _isValid = false;
         }
+    }
+    public void loadIntoMemory(Cell diskC, UpperBound ub, LinkedList<SpatialObject> list){
+        Cell memC = _ubm.getMinUB()._c;
+        _ubm.updateCell(memC, ub);
+        TwoWindowLists tl = new TwoWindowLists();
+        tl.load(list, StorageManager.currentTime);
+        _exactIndex.put(diskC, tl);
+        _exactIndex.remove(memC);
     }
 }

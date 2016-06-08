@@ -1,5 +1,6 @@
 package ROI;
 import org.mapdb.*;
+import sun.awt.image.ImageWatched;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -31,10 +32,10 @@ public class DiskIndex {
         _db.commit();
     }
     public UpperBound getMax(){
-        return _ubm.getMaxUB();
+        return _ubm.getTopUB();
     }
     public double maxUB(){
-        return _ubm.getMax();
+        return _ubm.getTopUB().upperBound();
     }
 
 
@@ -59,12 +60,14 @@ public class DiskIndex {
         _db.commit();
         _cacheSize = 0;
     }
-    public void processObject(SpatialObject o, Cell c){
-        //process cells affected by object o and are maintained in disk
-    }
+
 
     /******************************************************/
-
+    public void loadIntoDisk(Cell memC, UpperBound ub, TwoWindowLists tl, BTreeMap<Cell, LinkedList<SpatialObject>> btreemap){
+        Cell diskC = _ubm.getTopUB()._c;
+        _ubm.updateCell(diskC, ub);
+        btreemap.put(memC, tl.getListOfSpatialObject());
+    }
     public void insertIntoIndex(SpatialObject o, Cell c, ObjectType t){
         TwoWindowLists list = null;
         if(_cacheObj.containsKey(c)){

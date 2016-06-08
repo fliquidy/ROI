@@ -62,4 +62,7 @@ public class Bound {
         }
         _exact = false;
     }
+    public String toString(){
+        return String.format("[%f, %f | %f]", _currentValue, _pastValue, _upperbound);
+    }
 }

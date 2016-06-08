@@ -7,11 +7,8 @@ import org.mapdb.*;
 
 public class StorageManager {
 
-	public static double currentWindow;
-	public static double pastWindow;
 	public static double validWindow;
-	public static double currentTime;
-	public static Config config;
+	public static int currentTime;
 
 	public MemIndex memIdx;
 	public DiskIndex diskIdx;
@@ -47,19 +44,10 @@ public class StorageManager {
 			diskIdx.insertIntoIndex(o, cur, t);
 		}
 
-		while(maintainIndex(memIdx, diskIdx)){
-			//memIdx.search();
-		}
 
 	}
-	public boolean maintainIndex(MemIndex mIdx, DiskIndex dIdx){
-		//maintain memIdx and diskIdx.
-		if(mIdx.minUB() > dIdx.maxUB()){
-			return false;
-		}
-		while(swap(mIdx, dIdx));
-		return true;
-	}
+
+	/*
 	public boolean swap(MemIndex mIdx, DiskIndex dIdx){
 		if(mIdx.minUB() > dIdx.maxUB()){
 			return false;
@@ -67,9 +55,9 @@ public class StorageManager {
 		UpperBound dub = dIdx.getMax();
 		UpperBound mub = mIdx.getMin();
 		mub.upperbound = 0 - mub.upperbound;
-//		mIdx.ubm.updateCellUB(mub.c, dub.c, dub.upperbound, dub.updatetime);
+		mIdx._ubm.updateCellUB(mub.c, dub.c, dub.upperbound, dub.updatetime);
 		mIdx.setUB(mub.c, dub.c, dub.upperbound, dub.updatetime);
-		dIdx.ubm.updateCellUB(dub.c, mub.c, 0 - mub.upperbound, mub.updatetime);
+		dIdx._ubm.updateCellUB(dub.c, mub.c, 0 - mub.upperbound, mub.updatetime);
 		LinkedList<SpatialObject> dl = dIdx.retrieve(dub.c);
 		mIdx.write(dub.c, dl);
 		LinkedList<SpatialObject> ml = mIdx.retrieve(mub.c);
@@ -77,6 +65,7 @@ public class StorageManager {
 		mIdx.remove(mub.c);
 		return true;
 	}
+	*/
 	public void updateResult(){
 
 	}
@@ -108,10 +97,8 @@ public class StorageManager {
 	public UpperboundManager DiskUM;
 	
 	//config
-	Config _config;
-	
+
 	public StorageManager(Type t, Config config){
-		_config = new Config(config);
 		smax = 0;
 		
 		db.createTreeMap("detail").makeOrGet();//store details of spatial objects
@@ -160,11 +147,11 @@ public class StorageManager {
 		 */
 		cache.addElement(o);
 		Cell c = o.locateCell(a, b);
-		double ub = updateUBInDisk(c, o);
-		if(cache.size() > _config.cacheSize || ub > smax){
-			//write cache to disk
-			flush();
-		}
+//		double ub = updateUBInDisk(c, o);
+//		if(cache.size() > Config._cacheConstraint||  smax){
+//			//write cache to disk
+//			flush();
+//		}
 		//cacheSize +=
 	}
 	
@@ -184,7 +171,7 @@ public class StorageManager {
 		map.put(o._id, o);
 	}
 
-
+/*
 	public double updateUBInDisk(Cell c, SpatialObject o){
 		//update the loose upper bound for the cells in disk
 		if(upperBoundInRestCells.size() < _config.ubInRestCellsCount){
@@ -206,7 +193,7 @@ public class StorageManager {
 		return upperBoundInRestCells.lastElement()._UB;
 		
 	}
-	
+*/
 	public void flush(){
 		/*
 		 * Write the spatial objects in cache into disk.
@@ -273,6 +260,10 @@ public class StorageManager {
 		coMap.put(c, exactIndex.get(c));
 		exactIndex.remove(c);
 		
+	}
+//**********
+	public void processSpatialObject(SpatialObject o, ObjectType ot){
+
 	}
 	public double cacheSize(){
 		//To be done.

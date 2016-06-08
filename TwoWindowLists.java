@@ -43,6 +43,19 @@ public class TwoWindowLists {
                 break;
         }
     }
+    public void load(LinkedList<SpatialObject> list, int currentTime){
+        for(SpatialObject o : list){
+            if(currentTime - o._time < Config._currentWindow + Config._pastWindow
+                    && currentTime - o._time > Config._currentWindow){
+                _pastWindow.addLast(o);
+                _pastSum += o._weight / Config._pastWindow;
+            }
+            else if(currentTime - o._time < Config._currentWindow){
+                _currentWindow.addLast(o);
+                _currentSum += o._weight/Config._currentWindow;
+            }
+        }
+    }
     public int mostRecentTime(){
         return _currentWindow.getLast()._time;
     }
