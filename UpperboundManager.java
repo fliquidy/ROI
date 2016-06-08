@@ -22,9 +22,6 @@ public class UpperboundManager {
     public double getUB(Cell c){
         return myheap.get(mymap.get(c))._bound.upperBound();
     }
-    public void set(Cell c, double current, double past){
-
-    }
     public void updateUBforCell(Cell c, SpatialObject o, ObjectType ot){
         int idx = 0;
         if(mymap.containsKey(c)){
@@ -62,7 +59,6 @@ public class UpperboundManager {
         }
         return myheap.get(1);
     }
-
     private void updateHeap(int index){
         int father = index/2;
         int lchild = index * 2;
