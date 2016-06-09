@@ -4,6 +4,7 @@ package ROI;
  * Created by kaiyu on 5/4/2016.
  */
 public class UpperBound {
+    public static int size;
     public Bound _bound;
     public Point _p;
     public boolean _isExact;

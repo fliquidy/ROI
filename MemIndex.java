@@ -15,9 +15,12 @@ public class  MemIndex {
     public MemUBM _ubm;
     public HashMap<Cell, TwoWindowLists> _exactIndex;
 
+    public int size;
+
     public MemIndex(){
         _ubm = new MemUBM();
         _exactIndex = new HashMap<>();
+        size = 0;
     }
     public void remove(Cell c){
         _exactIndex.remove(c);
@@ -60,7 +63,15 @@ public class  MemIndex {
     }
 
     /*******************************************/
-
+    public UpperBound getMinUB(){
+        return _ubm.getMinUB();
+    }
+    public double getMinUBValue(){
+        return _ubm.getMinUB().upperBound();
+    }
+    public Cell getMinUBCell(){
+        return _ubm.getMinUB()._c;
+    }
     public void search(double a, double b){
         /*search all cells whose upper bound is larger than the current result.
         return true if current result is updated, and false otherwise
@@ -87,12 +98,13 @@ public class  MemIndex {
             _isValid = false;
         }
     }
-    public void loadIntoMemory(Cell diskC, UpperBound ub, LinkedList<SpatialObject> list){
+    public void loadIntoMemory(Cell diskC, UpperBound ub, TwoWindowLists tl){
         Cell memC = _ubm.getMinUB()._c;
         _ubm.updateCell(memC, ub);
-        TwoWindowLists tl = new TwoWindowLists();
-        tl.load(list, StorageManager.currentTime);
         _exactIndex.put(diskC, tl);
         _exactIndex.remove(memC);
+    }
+    public int size(){
+        return _exactIndex.si
     }
 }

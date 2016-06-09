@@ -63,6 +63,15 @@ public class DiskIndex {
 
 
     /******************************************************/
+    public double getMaxUBValue(){
+        return _ubm.getTopValue();
+    }
+    public Cell getMaxUBCell(){
+        return _ubm.getTopUB()._c;
+    }
+    public UpperBound getMaxUB(){
+        return _ubm.getTopUB();
+    }
     public void loadIntoDisk(Cell memC, UpperBound ub, TwoWindowLists tl, BTreeMap<Cell, LinkedList<SpatialObject>> btreemap){
         Cell diskC = _ubm.getTopUB()._c;
         _ubm.updateCell(diskC, ub);

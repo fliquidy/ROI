@@ -10,6 +10,9 @@ public class StorageManager {
 	public static double validWindow;
 	public static int currentTime;
 
+	public static String dbName;
+	public static String cellListName = "cell_list";
+
 	public MemIndex memIdx;
 	public DiskIndex diskIdx;
 
@@ -233,9 +236,6 @@ public class StorageManager {
 
 		}
 	}
-	public void balance(){
-
-	}
 	/*public void swap(){
 		if(ubInMemVec.firstElement()._UB < ub){
 			if(MemIndexSize() + upp){
@@ -262,9 +262,25 @@ public class StorageManager {
 		
 	}
 //**********
-	public void processSpatialObject(SpatialObject o, ObjectType ot){
+	public void balance(){
+		//balance cells between memory and disk
+		BTreeMap<Cell, LinkedList<SpatialObject>> treeMap = db.createTreeMap(cellListName).makeOrGet();
+		while(memIdx.getMinUBValue() < diskIdx.getMaxUBValue() + Config._swapThreshold){
+			Cell memC = new Cell(memIdx.getMinUBCell());
+			Cell diskC = new Cell(diskIdx.getMaxUBCell());
+			TwoWindowLists mtl = memIdx._exactIndex.get(memC);
+			TwoWindowLists dtl = new TwoWindowLists();
+			LinkedList<SpatialObject> list = treeMap.get(diskC);
+			dtl.load(list, StorageManager.currentTime);
+			int memCSize = mtl.size();
+			int diskCSize = dtl.size();
+
+			diskIdx.loadIntoDisk(memC, memIdx.getMinUB(), mtl, treeMap);
+			memIdx.loadIntoMemory(diskC, diskIdx.getMaxUB(), dtl);
+		}
 
 	}
+
 	public double cacheSize(){
 		//To be done.
 		return cacheSize;

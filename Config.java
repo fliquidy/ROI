@@ -9,6 +9,9 @@ public class Config {
 
 	public static double _cacheConstraint;
 
+
+	public static double _swapThreshold;
+
 	public Config(){
 		
 	}
