@@ -24,7 +24,11 @@ public class MemUBM {
     }
     public void updateCell(Cell c, UpperBound ub){
         maxUBM.updateCell(c, ub);
-        maxUBM.updateCell(c, ub);
+        minUBM.updateCell(c, ub);
+    }
+    public void remove(Cell c){
+        maxUBM.remove(c);
+        minUBM.remove(c);
     }
     public UpperBound getMaxUB(){
         return maxUBM.getTopUB();

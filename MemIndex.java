@@ -22,14 +22,9 @@ public class  MemIndex {
         _exactIndex = new HashMap<>();
         size = 0;
     }
-    public void remove(Cell c){
-        _exactIndex.remove(c);
-    }
 
 
-    public void processObject(SpatialObject o, Cell c){
-        //process cells which are affected by object and are maintained in memory.
-    }
+
 
     public void searchCell(double a, double b, UpperBound ub){
         Cell c = ub._c;
@@ -94,17 +89,32 @@ public class  MemIndex {
         else{
             System.err.println("Cell "+c.toString()+" is not in memory.");
         }
+        switch(t){
+            case New: size += o.size();
+                break;
+            case Expired: size -= o.size();
+                break;
+            default:
+                break;
+        }
         if(o.locateCell(Config._a, Config._b).equals(_maxPosition.locateCell(Config._a, Config._b))){
             _isValid = false;
         }
+    }
+    public void remove(Cell c){
+        size -= _exactIndex.get(c).spaceCost();
+        _exactIndex.remove(c);
+        _ubm.remove(c);
+
     }
     public void loadIntoMemory(Cell diskC, UpperBound ub, TwoWindowLists tl){
         Cell memC = _ubm.getMinUB()._c;
         _ubm.updateCell(memC, ub);
         _exactIndex.put(diskC, tl);
         _exactIndex.remove(memC);
+        size += tl.spaceCost();
     }
     public int size(){
-        return _exactIndex.si
+        return size;
     }
 }

@@ -8,6 +8,7 @@ public class Config {
 	public static double _b;
 
 	public static double _cacheConstraint;
+	public static double _memoryConstraint;
 
 
 	public static double _swapThreshold;

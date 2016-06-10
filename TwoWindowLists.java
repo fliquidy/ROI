@@ -13,18 +13,23 @@ public class TwoWindowLists {
     public LinkedList<SpatialObject> _pastWindow;
     public double _currentSum;
     public double _pastSum;
+    public double _spaceCost;
     public TwoWindowLists(){
         _currentWindow = new LinkedList<>();
         _pastWindow = new LinkedList<>();
+        _currentSum = 0;
+        _pastSum = 0;
+        _spaceCost = 0;
     }
     public void add(SpatialObject o){
         _currentWindow.addLast(o);
         _currentSum += o._weight/Config._currentWindow;
+        _spaceCost += o.size();
     }
     public void remove(){
         _pastSum -= _pastWindow.getFirst()._weight/Config._pastWindow;
+        _spaceCost -= _pastWindow.getFirst().size();
         _pastWindow.removeFirst();
-
     }
     public void transform(){
         SpatialObject o = _currentWindow.getFirst();
@@ -49,10 +54,12 @@ public class TwoWindowLists {
                     && currentTime - o._time > Config._currentWindow){
                 _pastWindow.addLast(o);
                 _pastSum += o._weight / Config._pastWindow;
+                _spaceCost += o.size();
             }
             else if(currentTime - o._time < Config._currentWindow){
                 _currentWindow.addLast(o);
                 _currentSum += o._weight/Config._currentWindow;
+                _spaceCost += o.size();
             }
         }
     }
@@ -102,6 +109,9 @@ public class TwoWindowLists {
         }
         Arrays.sort(xcoords);
         return xcoords;
+    }
+    public double spaceCost(){
+        return _spaceCost;
     }
     //test
     public void print(){

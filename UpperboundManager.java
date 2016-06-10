@@ -115,6 +115,25 @@ public class UpperboundManager {
             }
         }
     }
+    public void remove(Cell c){
+        if(!mymap.containsKey(c)){
+            System.err.println("Cell "+c.toString()+" is not found.");
+            System.exit(0);
+        }
+        int idx = mymap.get(c);
+        int lastIdx = myheap.size() - 1;
+        UpperBound tmp = myheap.get(lastIdx);
+        myheap.set(idx, tmp);
+        mymap.put(tmp._c, idx);
+        mymap.remove(c);
+        myheap.remove(lastIdx);
+        if(isMaxHeap){
+            updateMaxHeap(idx);
+        }
+        else{
+            updateMinHeap(idx);
+        }
+    }
     private void updateMaxHeap(int index){
         int father = index/2;
         int lchild = index * 2;
