@@ -103,11 +103,10 @@ public class StorageManager {
 //**********
 	public void balance(){
 		//balance cells between memory and disk
-		BTreeMap<Cell, LinkedList<SpatialObject>> treeMap = db.createTreeMap(cellListName).makeOrGet();
 		while(memIdx.getMinUBValue() < diskIdx.getMaxUBValue() + Config._swapThreshold){
 			Cell diskC = new Cell(diskIdx.getMaxUBCell());
 			TwoWindowLists dtl = new TwoWindowLists();
-			dtl.load(treeMap.get(diskC), StorageManager.currentTime);
+			dtl.load(diskIdx.getList(diskC), StorageManager.currentTime);
 			int diskCSize = dtl.size();
 			while(diskCSize + memIdx.size() > Config._memoryConstraint ){
 				if(memIdx._exactIndex.isEmpty()){
@@ -116,7 +115,7 @@ public class StorageManager {
 				}
 				Cell memC = new Cell(memIdx.getMinUBCell());
 				TwoWindowLists mtl = memIdx._exactIndex.get(memC);
-				diskIdx.loadIntoDisk(memC, memIdx.getMinUB(), mtl, treeMap);
+				diskIdx.loadIntoDisk(memC, memIdx.getMinUB(), mtl);
 				memIdx.remove(memC);
 			}
 			memIdx.loadIntoMemory(diskC, diskIdx.getMaxUB(), dtl);
@@ -126,17 +125,24 @@ public class StorageManager {
 			Cell diskC = new Cell(diskIdx.getMaxUBCell());
 			TwoWindowLists mtl = memIdx._exactIndex.get(memC);
 			TwoWindowLists dtl = new TwoWindowLists();
-			LinkedList<SpatialObject> list = treeMap.get(diskC);
+			LinkedList<SpatialObject> list = diskIdx.getList(diskC);
 			dtl.load(list, StorageManager.currentTime);
 			int memCSize = mtl.size();
 			int diskCSize = dtl.size();
 
-			diskIdx.loadIntoDisk(memC, memIdx.getMinUB(), mtl, treeMap);
+			diskIdx.loadIntoDisk(memC, memIdx.getMinUB(), mtl);
 			memIdx.loadIntoMemory(diskC, diskIdx.getMaxUB(), dtl);
 		}
 
 	}
+	public boolean processCellObj(Cell c, SpatialObject o, ObjectType ot){
+		if(memIdx.containCell(c)){
+			boolean isFull = memIdx.insertIntoIndex(o, c, ot);
+			if(isFull){
 
+			}
+		}
+	}
 	public void processSpatialObject(SpatialObject o, ObjectType t){
 		StorageManager.currentTime = o._time;
 		Cell c = o.locateCell(a, b);

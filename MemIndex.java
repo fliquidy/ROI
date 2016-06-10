@@ -58,8 +58,14 @@ public class  MemIndex {
     }
 
     /*******************************************/
+    public boolean containCell(Cell c){
+        return _exactIndex.containsKey(c);
+    }
     public UpperBound getMinUB(){
         return _ubm.getMinUB();
+    }
+    public UpperBound getUB(Cell c){
+        return _ubm.getUB(c);
     }
     public double getMinUBValue(){
         return _ubm.getMinUB().upperBound();
@@ -80,7 +86,7 @@ public class  MemIndex {
     public boolean safeToSkipSearch(){
         return _isValid && _maxPosition._weight >= _ubm.getMaxUB().upperBound();
     }
-    public void insertIntoIndex(SpatialObject o, Cell c, ObjectType t){
+    public boolean insertIntoIndex(SpatialObject o, Cell c, ObjectType t){
         //add into index, update upper bounds.
         if(_exactIndex.containsKey(c)){
             _exactIndex.get(c).addObject(o, t);
@@ -100,6 +106,7 @@ public class  MemIndex {
         if(o.locateCell(Config._a, Config._b).equals(_maxPosition.locateCell(Config._a, Config._b))){
             _isValid = false;
         }
+        return size > Config._memoryConstraint;
     }
     public void remove(Cell c){
         size -= _exactIndex.get(c).spaceCost();
@@ -113,6 +120,12 @@ public class  MemIndex {
         _exactIndex.put(diskC, tl);
         _exactIndex.remove(memC);
         size += tl.spaceCost();
+    }
+    public void writeToDisk(Cell c, DiskIndex diskIdx){
+        UpperBound ub = _ubm.getUB(c);
+        TwoWindowLists tl = _exactIndex.get(c);
+        diskIdx.loadIntoDisk(c, ub, tl);
+        diskIdx.commit();
     }
     public int size(){
         return size;

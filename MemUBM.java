@@ -36,6 +36,9 @@ public class MemUBM {
     public UpperBound getMinUB(){
         return minUBM.getTopUB();
     }
+    public UpperBound getUB(Cell c){
+        return maxUBM.getUB(c);
+    }
     public static void main(String[] args){
         Config._currentWindow = 10;
         Config._pastWindow = 10;

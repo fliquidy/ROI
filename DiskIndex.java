@@ -12,13 +12,18 @@ import java.io.File;
 public class DiskIndex {
     public UpperboundManager _ubm;
     public DB _db;
+    public BTreeMap<Cell, LinkedList<SpatialObject>> _cellObjMap;
     public HashMap<Cell, TwoWindowLists> _cacheObj;
     public HashMap<Cell, Integer> _time;
     public double _cacheSize;
 
+    public static String _dbName = "roi";
+    public static String _cellObjName = "cell_list";
+
     public DiskIndex(){
-        _db = DBMaker.newFileDB(new File("roi")).closeOnJvmShutdown().cacheDisable().make();
+        _db = DBMaker.newFileDB(new File(_dbName)).closeOnJvmShutdown().cacheDisable().make();
         _cacheObj = new HashMap<Cell, TwoWindowLists>();
+        _cellObjMap = _db.createTreeMap(_cellObjName).makeOrGet();
         _cacheSize = 0;
     }
     public LinkedList<SpatialObject> retrieve(Cell c){
@@ -72,10 +77,16 @@ public class DiskIndex {
     public UpperBound getMaxUB(){
         return _ubm.getTopUB();
     }
-    public void loadIntoDisk(Cell memC, UpperBound ub, TwoWindowLists tl, BTreeMap<Cell, LinkedList<SpatialObject>> btreemap){
+    public LinkedList<SpatialObject> getList(Cell c){
+        return _cellObjMap.get(c);
+    }
+    public void loadIntoDisk(Cell memC, UpperBound ub, TwoWindowLists tl){
         Cell diskC = _ubm.getTopUB()._c;
         _ubm.updateCell(diskC, ub);
-        btreemap.put(memC, tl.getListOfSpatialObject());
+        _cellObjMap.put(memC, tl.getListOfSpatialObject());
+    }
+    public void commit(){
+        _db.commit();
     }
     public void insertIntoIndex(SpatialObject o, Cell c, ObjectType t){
         TwoWindowLists list = null;

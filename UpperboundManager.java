@@ -20,8 +20,9 @@ public class UpperboundManager {
         UpperBound ub = new UpperBound();
         myheap.add(ub);
     }
-    public double getUB(Cell c){
-        return myheap.get(mymap.get(c))._bound.upperBound();
+    public UpperBound getUB(Cell c){
+
+        return myheap.get(mymap.get(c));
     }
     public void updateUBforCell(Cell c, SpatialObject o, ObjectType ot){
         int idx = 0;
