@@ -155,6 +155,10 @@ public class StorageManager {
 			memIdx.search(Config._a, Config._b);
 			balance();
 		}
+		if(memIdx._updatedResult){
+			System.out.println("Best region changed:");
+			System.out.println("Top-right corner: ("+memIdx._maxPosition._x+", "+memIdx._maxPosition._y+")");
+		}
 	}
 
 }

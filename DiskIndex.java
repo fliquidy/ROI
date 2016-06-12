@@ -60,8 +60,8 @@ public class DiskIndex {
                 comap.put(c, l);
             }
             _time.put(c, tl.mostRecentTime());
-            _cacheObj.remove(c);
         }
+        _cacheObj.clear();
         _db.commit();
         _cacheSize = 0;
     }
