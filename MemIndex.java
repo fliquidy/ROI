@@ -84,7 +84,7 @@ public class  MemIndex {
         }
     }
     public boolean safeToSkipSearch(){
-        return _isValid && _maxPosition._weight >= _ubm.getMaxUB().upperBound();
+        return _isValid && _maxPosition._weight == _ubm.getMaxUB().upperBound();
     }
     public boolean insertIntoIndex(SpatialObject o, Cell c, ObjectType t){
         //add into index, update upper bounds.
@@ -108,25 +108,20 @@ public class  MemIndex {
         }
         return size > Config._memoryConstraint;
     }
-    public void remove(Cell c){
+    public void removeFromMemory(Cell c){
         size -= _exactIndex.get(c).spaceCost();
         _exactIndex.remove(c);
         _ubm.remove(c);
 
     }
     public void loadIntoMemory(Cell diskC, UpperBound ub, TwoWindowLists tl){
-        Cell memC = _ubm.getMinUB()._c;
-        _ubm.updateCell(memC, ub);
+        _ubm.addCell(diskC, ub);
         _exactIndex.put(diskC, tl);
-        _exactIndex.remove(memC);
         size += tl.spaceCost();
     }
-    public void writeToDisk(Cell c, DiskIndex diskIdx){
-        UpperBound ub = _ubm.getUB(c);
-        TwoWindowLists tl = _exactIndex.get(c);
-        diskIdx.loadIntoDisk(c, ub, tl);
-        diskIdx.commit();
-    }
+
+
+
     public int size(){
         return size;
     }

@@ -82,8 +82,14 @@ public class DiskIndex {
     }
     public void loadIntoDisk(Cell memC, UpperBound ub, TwoWindowLists tl){
         Cell diskC = _ubm.getTopUB()._c;
-        _ubm.updateCell(diskC, ub);
+        _ubm.addCell(diskC, ub);
         _cellObjMap.put(memC, tl.getListOfSpatialObject());
+    }
+    public void remove(Cell c){
+        _ubm.remove(c);
+    }
+    public void writeToMemory(Cell diskC, MemIndex memIdx){
+
     }
     public void commit(){
         _db.commit();

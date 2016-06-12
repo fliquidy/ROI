@@ -18,13 +18,17 @@ public class MemUBM {
         minUBM = new UpperboundManager();
         minUBM.isMaxHeap = false;
     }
+    public void addCell(Cell c, UpperBound ub){
+        maxUBM.addCell(c, ub);
+        minUBM.addCell(c, ub);
+    }
     public void updateUBforCell(Cell c, SpatialObject o, ObjectType ot){
         maxUBM.updateUBforCell(c, o, ot);
         minUBM.updateUBforCell(c, o, ot);
     }
-    public void updateCell(Cell c, UpperBound ub){
-        maxUBM.updateCell(c, ub);
-        minUBM.updateCell(c, ub);
+    public void replaceCell(Cell c, UpperBound ub){
+        maxUBM.replaceCell(c, ub);
+        minUBM.replaceCell(c, ub);
     }
     public void remove(Cell c){
         maxUBM.remove(c);

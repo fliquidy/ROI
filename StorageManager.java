@@ -101,39 +101,33 @@ public class StorageManager {
 
 
 //**********
+
 	public void balance(){
 		//balance cells between memory and disk
-		while(memIdx.getMinUBValue() < diskIdx.getMaxUBValue() + Config._swapThreshold){
-			Cell diskC = new Cell(diskIdx.getMaxUBCell());
-			TwoWindowLists dtl = new TwoWindowLists();
-			dtl.load(diskIdx.getList(diskC), StorageManager.currentTime);
-			int diskCSize = dtl.size();
-			while(diskCSize + memIdx.size() > Config._memoryConstraint ){
-				if(memIdx._exactIndex.isEmpty()){
-					System.err.println("Too large to load into memory. More memory is needed.");
-					System.exit(0);
-				}
+		Cell diskC = null;
+		TwoWindowLists dtl = null;
+		while(memIdx.getMinUBValue() < diskIdx.getMaxUBValue() + Config._swapThreshold ||
+				memIdx._maxPosition._weight < diskIdx.getMaxUBValue() ) {
+			if (diskC == null) {
+				diskC = new Cell(diskIdx.getMaxUBCell());
+			}
+			if (dtl == null) {
+				dtl = new TwoWindowLists();
+				dtl.load(diskIdx.getList(diskC), StorageManager.currentTime);
+			}
+			if (memIdx.size() + dtl.size() > Config._memoryConstraint) {
 				Cell memC = new Cell(memIdx.getMinUBCell());
 				TwoWindowLists mtl = memIdx._exactIndex.get(memC);
 				diskIdx.loadIntoDisk(memC, memIdx.getMinUB(), mtl);
-				memIdx.remove(memC);
+				memIdx.removeFromMemory(memC);
+			} else {
+				memIdx.loadIntoMemory(diskC, diskIdx.getMaxUB(), dtl);
+				diskIdx.remove(diskC);
+				diskC = null;
+				dtl = null;
 			}
-			memIdx.loadIntoMemory(diskC, diskIdx.getMaxUB(), dtl);
-		}
-		while(memIdx.getMinUBValue() < diskIdx.getMaxUBValue() + Config._swapThreshold){
-			Cell memC = new Cell(memIdx.getMinUBCell());
-			Cell diskC = new Cell(diskIdx.getMaxUBCell());
-			TwoWindowLists mtl = memIdx._exactIndex.get(memC);
-			TwoWindowLists dtl = new TwoWindowLists();
-			LinkedList<SpatialObject> list = diskIdx.getList(diskC);
-			dtl.load(list, StorageManager.currentTime);
-			int memCSize = mtl.size();
-			int diskCSize = dtl.size();
 
-			diskIdx.loadIntoDisk(memC, memIdx.getMinUB(), mtl);
-			memIdx.loadIntoMemory(diskC, diskIdx.getMaxUB(), dtl);
 		}
-
 	}
 	public boolean processCellObj(Cell c, SpatialObject o, ObjectType ot){
 		if(memIdx.containCell(c)){

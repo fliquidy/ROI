@@ -44,7 +44,18 @@ public class UpperboundManager {
             updateMinHeap(idx);
         }
     }
-    public void updateCell(Cell c, UpperBound ub){
+    public void addCell(Cell c, UpperBound ub){
+        int idx = mymap.size();
+        myheap.add(ub);
+        mymap.put(c, idx);
+        if(isMaxHeap){
+            updateMaxHeap(idx);
+        }
+        else{
+            updateMinHeap(idx);
+        }
+    }
+    public void replaceCell(Cell c, UpperBound ub){
         if(!mymap.containsKey(c)){
             System.err.println("Cell ("+c._x+", "+c._y+") is not in UpperBoundManager");
             System.exit(0);
