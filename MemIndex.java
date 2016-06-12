@@ -83,8 +83,8 @@ public class  MemIndex {
             searchCell(a, b, ub);
         }
     }
-    public boolean safeToSkipSearch(){
-        return _isValid && _maxPosition._weight == _ubm.getMaxUB().upperBound();
+    public boolean needToSearch(){
+        return (!_isValid) || (_maxPosition._weight < _ubm.getMaxUB().upperBound());
     }
     public boolean insertIntoIndex(SpatialObject o, Cell c, ObjectType t){
         //add into index, update upper bounds.
@@ -120,7 +120,11 @@ public class  MemIndex {
         size += tl.spaceCost();
     }
 
-
+    public void moveMinCellToDisk(DiskIndex diskIdx){
+        Cell c = new Cell(_ubm.getMinUB()._c);
+        diskIdx.loadIntoDisk(c, _ubm.getMinUB(), _exactIndex.get(c));
+        removeFromMemory(c);
+    }
 
     public int size(){
         return size;

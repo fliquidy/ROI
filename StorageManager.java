@@ -129,46 +129,32 @@ public class StorageManager {
 
 		}
 	}
-	public boolean processCellObj(Cell c, SpatialObject o, ObjectType ot){
+	public void processCellObj(Cell c, SpatialObject o, ObjectType ot){
 		if(memIdx.containCell(c)){
 			boolean isFull = memIdx.insertIntoIndex(o, c, ot);
 			if(isFull){
-
+				memIdx.moveMinCellToDisk(diskIdx);
 			}
 		}
+		else{
+			diskIdx.insertIntoIndex(o, c, ot);
+		}
 	}
+
 	public void processSpatialObject(SpatialObject o, ObjectType t){
 		StorageManager.currentTime = o._time;
 		Cell c = o.locateCell(a, b);
 		Cell cu = c.up();
 		Cell cr = c.right();
 		Cell cur = c.upright();
-		if(cellsInMem.contains(c)){
-			memIdx.insertIntoIndex(o, c, t);
+		processCellObj(c, o, t);
+		processCellObj(cu, o, t);
+		processCellObj(cr, o, t);
+		processCellObj(cur, o, t);
+		while(memIdx.needToSearch() || diskIdx.getMaxUB().upperBound() > memIdx._maxPosition._weight){
+			memIdx.search(Config._a, Config._b);
+			balance();
 		}
-		else{
-			diskIdx.insertIntoIndex(o, c, t);
-		}
-		if(cellsInMem.contains(cu)){
-			memIdx.insertIntoIndex(o, cu, t);
-		}
-		else{
-			diskIdx.insertIntoIndex(o, cu, t);
-		}
-		if(cellsInMem.contains(cr)){
-			memIdx.insertIntoIndex(o, cr, t);
-		}
-		else{
-			diskIdx.insertIntoIndex(o, cr, t);
-		}
-		if(cellsInMem.contains(cur)){
-			memIdx.insertIntoIndex(o, cur, t);
-		}
-		else{
-			diskIdx.insertIntoIndex(o, cur, t);
-		}
-
-
 	}
 
 }
