@@ -23,6 +23,7 @@ public class DiskIndex {
     public DiskIndex(){
         _db = DBMaker.newFileDB(new File(_dbName)).closeOnJvmShutdown().cacheDisable().make();
         _cacheObj = new HashMap<Cell, TwoWindowLists>();
+        _ubm = new UpperboundManager();
         _cellObjMap = _db.createTreeMap(_cellObjName).makeOrGet();
         _cacheSize = 0;
     }
@@ -70,6 +71,9 @@ public class DiskIndex {
     /******************************************************/
     public double getMaxUBValue(){
         return _ubm.getTopValue();
+    }
+    public boolean isEmpty(){
+        return _ubm.isEmpty();
     }
     public Cell getMaxUBCell(){
         return _ubm.getTopUB()._c;

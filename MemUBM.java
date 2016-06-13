@@ -51,9 +51,9 @@ public class MemUBM {
         Cell c2 = new Cell(1, 1);
         Cell c3 = new Cell(2, 2);
 
-        SpatialObject o1 = new SpatialObject(1, 1, 1, 1.0, 1.0, 1.0);
-        SpatialObject o2 = new SpatialObject(2, 2, 2, 2.0, 2.0, 2.0);
-        SpatialObject o3 = new SpatialObject(3, 3, 3, 2.0, 2.0, 3.0);
+        SpatialObject o1 = new SpatialObject(1, 1, 1.0, 1.0, 1.0);
+        SpatialObject o2 = new SpatialObject(2, 2, 2.0, 2.0, 2.0);
+        SpatialObject o3 = new SpatialObject(3, 3, 2.0, 2.0, 3.0);
         mubm.updateUBforCell(c1, o1, ObjectType.New);
         mubm.maxUBM.print();
         mubm.minUBM.print();

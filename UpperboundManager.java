@@ -8,6 +8,9 @@ public class UpperboundManager {
     ArrayList<UpperBound> myheap;
     HashMap<Cell, Integer> mymap;
     boolean isMaxHeap;
+    public boolean isEmpty(){
+        return myheap.size() <= 1;
+    }
     public UpperboundManager(int capacity){
         myheap = new ArrayList<>(capacity);
         mymap = new HashMap<>(capacity);

@@ -23,7 +23,7 @@ public class BurstInterval {
         maxScore = 0;
     }
     public void insertInterval(Interval interval, double nextY){
-        int begin = 0, end = dicriminant.length;
+        int begin = 0, end = dicriminant.length-1;
         int lIdx = (begin + end)/2;
         int rIdx = (begin + end)/2;
         while(end - begin > 1){
@@ -48,7 +48,6 @@ public class BurstInterval {
             rIdx = (begin + end)/2;
         }
         rIdx = begin;
-        System.out.println(lIdx+" "+rIdx);
         for(int idx = lIdx; idx <= rIdx; idx++){
             if(interval.ot == ObjectType.New){
                 if(interval.et == EdgeType.Up){

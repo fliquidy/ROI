@@ -1,8 +1,8 @@
 package ROI;
 
 public class Config {
-	public static double _currentWindow;
-	public static double _pastWindow;
+	public static int _currentWindow;
+	public static int _pastWindow;
 
 	public static double _a;
 	public static double _b;
@@ -16,13 +16,18 @@ public class Config {
 	public Config(){
 		
 	}
-	public void setWindow(double cWindow, double pWindow){
+	public static void setWindow(int cWindow, int pWindow){
 		_currentWindow = cWindow;
 		_pastWindow = pWindow;
 	}
 
-	public void setRecSize(double a, double b){
+	public static void setRecSize(double a, double b){
 		_a = a;
 		_b = b;
+	}
+	public static void setConstraint(double cacheSize, double memorySize, double swapThreshold){
+		_cacheConstraint = cacheSize;
+		_memoryConstraint = memorySize;
+		_swapThreshold = swapThreshold;
 	}
 }

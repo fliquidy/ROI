@@ -15,12 +15,13 @@ public class  MemIndex {
     public MemUBM _ubm;
     public HashMap<Cell, TwoWindowLists> _exactIndex;
 
-    public int size;
+    public double size;
 
     public MemIndex(){
         _ubm = new MemUBM();
         _exactIndex = new HashMap<>();
         size = 0;
+        _maxPosition = new SpatialObject();
     }
 
 
@@ -78,7 +79,7 @@ public class  MemIndex {
         return true if current result is updated, and false otherwise
         */
         _updatedResult = false;
-        while(_ubm.getMaxUB().upperBound() > _maxPosition._weight || (!_isValid)){
+        while((!_isValid) || _ubm.getMaxUB().upperBound() > _maxPosition._weight){
             UpperBound ub = _ubm.getMaxUB();
             searchCell(a, b, ub);
         }
@@ -93,7 +94,10 @@ public class  MemIndex {
             _ubm.updateUBforCell(c, o, t);
         }
         else{
-            System.err.println("Cell "+c.toString()+" is not in memory.");
+            TwoWindowLists tl = new TwoWindowLists();
+            tl.addObject(o, t);
+            _exactIndex.put(c, tl);
+            _ubm.updateUBforCell(c, o, t);
         }
         switch(t){
             case New: size += o.size();
@@ -103,10 +107,11 @@ public class  MemIndex {
             default:
                 break;
         }
-        if(o.locateCell(Config._a, Config._b).equals(_maxPosition.locateCell(Config._a, Config._b))){
+        if(_maxPosition != null &&
+                o.locateCell(Config._a, Config._b).equals(_maxPosition.locateCell(Config._a, Config._b))){
             _isValid = false;
         }
-        return size > Config._memoryConstraint;
+        return size >= Config._memoryConstraint;
     }
     public void removeFromMemory(Cell c){
         size -= _exactIndex.get(c).spaceCost();
@@ -126,7 +131,7 @@ public class  MemIndex {
         removeFromMemory(c);
     }
 
-    public int size(){
+    public double size(){
         return size;
     }
 }

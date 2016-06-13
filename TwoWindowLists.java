@@ -132,15 +132,15 @@ public class TwoWindowLists {
     }
     public static void main(String[] args){
         TwoWindowLists tl = new TwoWindowLists();
-        tl.add(new SpatialObject(1, 1, 1, 1.0, 1.0, 1.0));
+        tl.add(new SpatialObject(1, 1, 1.0, 1.0, 1.0));
         tl.print();
-        tl.add(new SpatialObject(2, 2, 2, 2.0, 2.0, 2.0));
+        tl.add(new SpatialObject(2, 2, 2.0, 2.0, 2.0));
         tl.print();
         tl.transform();
         tl.print();
         double[] xcoords = tl.getXCoords(0.5);
         Config c = new Config();
-        c.setWindow(1.0, 1.0);
+        c.setWindow(1, 1);
         System.out.println(Config._currentWindow+" "+Config._pastWindow);
         /*
         for(int i=0; i < xcoords.length; i++){

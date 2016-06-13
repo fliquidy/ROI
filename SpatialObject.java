@@ -3,7 +3,6 @@ import java.util.Vector;
 
 public class SpatialObject implements java.io.Serializable {
 	public int _id;
-	public int _date;
 	public int _time;
 	public double _x;
 	public double _y;
@@ -13,9 +12,8 @@ public class SpatialObject implements java.io.Serializable {
 		
 	}
 
-	public SpatialObject(int id, int date, int time, double x, double y, double weight){
+	public SpatialObject(int id, int time, double x, double y, double weight){
 		this._id = id;
-		this._date = date;
 		this._time = time;
 		this._x = x;
 		this._y = y;
