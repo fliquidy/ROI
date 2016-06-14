@@ -57,6 +57,13 @@ public class  MemIndex {
         ub._bound.setColdUB(tl._currentSum, tl._pastSum);
         ub._p = p;
     }
+    public void printCells(){
+        for(Cell c:_exactIndex.keySet()){
+            System.out.print(c.toString()+" ");
+        }
+        System.out.println();
+
+    }
 
     /*******************************************/
     public boolean containCell(Cell c){

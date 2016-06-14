@@ -26,25 +26,34 @@ public class TwoWindowLists {
         _currentSum += o._weight/Config._currentWindow;
         _spaceCost += o.size();
     }
-    public void remove(){
-        _pastSum -= _pastWindow.getFirst()._weight/Config._pastWindow;
-        _spaceCost -= _pastWindow.getFirst().size();
-        _pastWindow.removeFirst();
+    public void remove(SpatialObject o){
+        if(!_pastWindow.isEmpty()){
+            SpatialObject o1 = _pastWindow.getFirst();
+            if(o1.equals(o)){
+                _pastSum -= o1._weight/Config._pastWindow;
+                _spaceCost -= o1.size();
+                _pastWindow.removeFirst();
+            }
+        }
     }
-    public void transform(){
-        SpatialObject o = _currentWindow.getFirst();
+    public void transform(SpatialObject o){
+        if(!_currentWindow.isEmpty()){
+            SpatialObject o1 = _currentWindow.getFirst();
+            if(o1.equals(o)){
+                _currentWindow.removeFirst();
+                _currentSum -= o._weight/Config._currentWindow;
+            }
+        }
         _pastWindow.addLast(o);
-        _currentWindow.removeFirst();
-        _currentSum -= o._weight/Config._currentWindow;
         _pastSum += o._weight/Config._pastWindow;
     }
     public void addObject(SpatialObject o, ObjectType ot){
         switch(ot){
             case New: add(o);
                 break;
-            case Old: transform();
+            case Old: transform(o);
                 break;
-            case Expired: remove();
+            case Expired: remove(o);
                 break;
         }
     }
@@ -64,7 +73,14 @@ public class TwoWindowLists {
         }
     }
     public int mostRecentTime(){
-        return _currentWindow.getLast()._time;
+        if(!_currentWindow.isEmpty()){
+            return _currentWindow.getLast()._time;
+        }
+        if(!_pastWindow.isEmpty()){
+            return _pastWindow.getLast()._time;
+        }
+        System.err.println("Empty TwoWindowList!!");
+        return -1;
     }
     public int size(){
         return _currentWindow.size() + _pastWindow.size();
@@ -136,7 +152,6 @@ public class TwoWindowLists {
         tl.print();
         tl.add(new SpatialObject(2, 2, 2.0, 2.0, 2.0));
         tl.print();
-        tl.transform();
         tl.print();
         double[] xcoords = tl.getXCoords(0.5);
         Config c = new Config();

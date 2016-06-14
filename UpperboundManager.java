@@ -11,6 +11,9 @@ public class UpperboundManager {
     public boolean isEmpty(){
         return myheap.size() <= 1;
     }
+    public boolean containCell(Cell c){
+        return mymap.containsKey(c);
+    }
     public UpperboundManager(int capacity){
         myheap = new ArrayList<>(capacity);
         mymap = new HashMap<>(capacity);
@@ -137,16 +140,21 @@ public class UpperboundManager {
         }
         int idx = mymap.get(c);
         int lastIdx = myheap.size() - 1;
-        UpperBound tmp = myheap.get(lastIdx);
-        myheap.set(idx, tmp);
-        mymap.put(tmp._c, idx);
-        mymap.remove(c);
-        myheap.remove(lastIdx);
-        if(isMaxHeap){
-            updateMaxHeap(idx);
+        if(idx == lastIdx){
+            mymap.remove(c);
+            myheap.remove(lastIdx);
         }
-        else{
-            updateMinHeap(idx);
+        else {
+            UpperBound tmp = myheap.get(lastIdx);
+            myheap.set(idx, tmp);
+            mymap.put(tmp._c, idx);
+            mymap.remove(c);
+            myheap.remove(lastIdx);
+            if (isMaxHeap) {
+                updateMaxHeap(idx);
+            } else {
+                updateMinHeap(idx);
+            }
         }
     }
     private void updateMaxHeap(int index){

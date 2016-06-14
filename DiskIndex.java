@@ -24,8 +24,12 @@ public class DiskIndex {
         _db = DBMaker.newFileDB(new File(_dbName)).closeOnJvmShutdown().cacheDisable().make();
         _cacheObj = new HashMap<Cell, TwoWindowLists>();
         _ubm = new UpperboundManager();
+        _time = new HashMap<Cell, Integer>();
         _cellObjMap = _db.createTreeMap(_cellObjName).makeOrGet();
         _cacheSize = 0;
+    }
+    public boolean containCell(Cell c){
+        return _ubm.containCell(c);
     }
     public LinkedList<SpatialObject> retrieve(Cell c){
         BTreeMap<Cell, LinkedList<SpatialObject>> comap = _db.createTreeMap("DCell_object").makeOrGet();
@@ -49,16 +53,38 @@ public class DiskIndex {
         BTreeMap<Cell, LinkedList<SpatialObject>> comap = _db.createTreeMap("DCell_object").makeOrGet();
         for(Cell c:_cacheObj.keySet()){
             TwoWindowLists tl = _cacheObj.get(c);
-            if(StorageManager.currentTime - _time.get(c) > (Config._pastWindow + Config._currentWindow)){
+            if(tl.size() == 0){
+                continue;
+            }
+            if(_time.containsKey(c) && StorageManager.currentTime - _time.get(c) > (Config._pastWindow + Config._currentWindow)){
                 comap.put(c, tl.getListOfSpatialObject());
             }
             else{
                 LinkedList<SpatialObject> l = comap.get(c);
-                while((!l.isEmpty()) && (StorageManager.currentTime - l.getFirst()._time > (Config._pastWindow + Config._currentWindow))){
-                    l.removeFirst();
+                if(l == null){
+                    l = tl.getListOfSpatialObject();
                 }
-                l.addAll(tl.getListOfSpatialObject());
+                else{
+                    while((!l.isEmpty()) && (StorageManager.currentTime - l.getFirst()._time > (Config._pastWindow + Config._currentWindow))){
+                        l.removeFirst();
+                    }
+                    l.addAll(tl.getListOfSpatialObject());
+                }
+
                 comap.put(c, l);
+            }
+            int time = tl.mostRecentTime();
+            if(time < 0){
+                System.out.print("past window: ");
+                for(SpatialObject o : tl._pastWindow){
+                    System.out.print(o._id+ " ");
+                }
+                System.out.println();
+                System.out.print("current window: ");
+                for(SpatialObject o : tl._currentWindow){
+                    System.out.print(o._id+" ");
+                }
+                System.out.println();
             }
             _time.put(c, tl.mostRecentTime());
         }
@@ -85,8 +111,7 @@ public class DiskIndex {
         return _cellObjMap.get(c);
     }
     public void loadIntoDisk(Cell memC, UpperBound ub, TwoWindowLists tl){
-        Cell diskC = _ubm.getTopUB()._c;
-        _ubm.addCell(diskC, ub);
+        _ubm.addCell(memC, ub);
         _cellObjMap.put(memC, tl.getListOfSpatialObject());
     }
     public void remove(Cell c){

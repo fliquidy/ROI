@@ -48,6 +48,7 @@ public class StorageManager {
 		//balance cells between memory and disk
 		Cell diskC = null;
 		TwoWindowLists dtl = null;
+		System.out.println("In memory: "+memIdx._exactIndex.size()+" In disk: "+diskIdx._ubm.mymap.size());
 		while((!diskIdx.isEmpty()) && (memIdx.getMinUBValue() < diskIdx.getMaxUBValue() + Config._swapThreshold ||
 				memIdx._maxPosition._weight < diskIdx.getMaxUBValue()) ) {
 			if (diskC == null) {
@@ -72,14 +73,19 @@ public class StorageManager {
 		}
 	}
 	public void processCellObj(Cell c, SpatialObject o, ObjectType ot){
-		if(memIdx.containCell(c) || memIdx.size < Config._memoryConstraint){
+		if(diskIdx.containCell(c) || //cell in disk
+				((!memIdx.containCell(c)) && memIdx.size > Config._memoryConstraint) // cell not in memory and memory is full
+				)	{
+			diskIdx.insertIntoIndex(o, c, ot);
+		}
+		else{
+			//System.out.println("inserting into "+c.toString()+" type: "+ot.toString()+" object ID: "+o._id);
 			boolean isFull = memIdx.insertIntoIndex(o, c, ot);
+			//System.out.print("before: memory usage: "+memIdx.size);
 			if(isFull){
 				memIdx.moveMinCellToDisk(diskIdx);
 			}
-		}
-		else{
-			diskIdx.insertIntoIndex(o, c, ot);
+			//System.out.println(" after: memory usage: "+memIdx.size);
 		}
 	}
 
@@ -89,6 +95,7 @@ public class StorageManager {
 		Cell cu = c.up();
 		Cell cr = c.right();
 		Cell cur = c.upright();
+		System.out.println("Affected cells: "+c.toString()+" "+cu.toString()+" "+cr.toString()+" "+cur.toString());
 		processCellObj(c, o, t);
 		processCellObj(cu, o, t);
 		processCellObj(cr, o, t);
@@ -99,7 +106,7 @@ public class StorageManager {
 			balance();
 		}
 		if(memIdx._updatedResult){
-			System.out.println("Best region changed:");
+			System.out.println("Best region changed. Cell: "+memIdx._maxPosition.locateCell(Config._a, Config._b).toString());
 			System.out.println("Top-right corner: ("+memIdx._maxPosition._x+", "+memIdx._maxPosition._y+")");
 			System.out.println("Score: " + memIdx._maxPosition._weight);
 		}

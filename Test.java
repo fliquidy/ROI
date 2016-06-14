@@ -12,10 +12,12 @@ public class Test {
 			StorageManager sm = new StorageManager(Type.Exact);
 			Config.setWindow(50, 50);
 			Config.setRecSize(20, 20);
-			Config.setConstraint(100, 200, 0);
-			while((line = bfr.readLine()) != null){
+			Config.setConstraint(0.2, 0.2, 0);
+			int cnt = 0;
+            while((line = bfr.readLine()) != null){
 				String[] split = line.split("\\s+");
-                System.out.println("processing: "+line);
+                System.out.println(cnt+": processing: "+line);
+                cnt ++;
 				int time = Integer.parseInt(split[0]);
 				int id = Integer.parseInt(split[1]);
 				double x = Double.parseDouble(split[2]);
@@ -32,6 +34,8 @@ public class Test {
 						break;
 				}
 				sm.processSpatialObject(so, t);
+                System.out.print("Cells in memory: ");
+                sm.memIdx.printCells();
 
 			}
 		}

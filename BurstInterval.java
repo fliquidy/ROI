@@ -37,7 +37,7 @@ public class BurstInterval {
         }
         lIdx = end;
         begin = 0;
-        end = dicriminant.length;
+        end = dicriminant.length - 1;
         while(end - begin > 1){
             if(dicriminant[rIdx] < interval.r){
                 begin = rIdx;
