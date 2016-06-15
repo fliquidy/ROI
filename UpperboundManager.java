@@ -95,9 +95,9 @@ public class UpperboundManager {
         int lchild = index * 2;
         int rchild = index * 2 + 1;
         //System.out.println("processing "+index+", "+myheap.get(index).upperBound());
-        if(father > 0 && myheap.get(father).upperBound() > myheap.get(index).upperBound()){
+        if(father > 0 && myheap.get(father).larger(myheap.get(index))){
             //move upwards
-            while(father > 0 && myheap.get(father).upperBound() > myheap.get(index).upperBound()){
+            while(father > 0 && myheap.get(father).larger(myheap.get(index))){
                 UpperBound tmp = myheap.get(index);
                 myheap.set(index, myheap.get(father));
                 myheap.set(father, tmp);
@@ -107,19 +107,19 @@ public class UpperboundManager {
                 index = index / 2;
             }
         }
-        else if((lchild < myheap.size() && myheap.get(lchild).upperBound() < myheap.get(index).upperBound())
-                ||(rchild < myheap.size() && myheap.get(rchild).upperBound() < myheap.get(index).upperBound())
+        else if((lchild < myheap.size() && myheap.get(lchild).smaller(myheap.get(index)))
+                ||(rchild < myheap.size() && myheap.get(rchild).smaller(myheap.get(index)))
                 ){
             //move downwards
             while(lchild < myheap.size()){
                 int swapIdx = 0;
                 if(rchild < myheap.size()){
-                    swapIdx = myheap.get(lchild).upperBound() < myheap.get(rchild).upperBound() ? lchild : rchild;
+                    swapIdx = myheap.get(lchild).smaller(myheap.get(rchild))? lchild : rchild;
                 }
                 else{
                     swapIdx = lchild;
                 }
-                if(myheap.get(swapIdx).upperBound() >= myheap.get(index).upperBound()){
+                if(!myheap.get(swapIdx).smaller(myheap.get(index))){
                     break;
                 }
                 UpperBound tmp = myheap.get(swapIdx);

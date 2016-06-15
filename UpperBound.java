@@ -37,6 +37,19 @@ public class UpperBound {
         _p._x = x;
         _p._y = y;
     }
+    public boolean larger(UpperBound ub){
+        //TODO
+        if(this.upperBound() > ub.upperBound())return true;
+        if(this._isExact && (!ub._isExact))return true;
+        return false;
+    }
+    public boolean smaller(UpperBound ub){
+        //TODO: check which is better: with a exact small upper bound or with an approximate small upper bound
+        if(this.upperBound() < ub.upperBound())return true;
+        if((!this._isExact) && ub._isExact)return true;
+        return false;
+
+    }
     public void copy(UpperBound ub){
         setBound(ub._bound._currentValue, ub._bound._pastValue, ub._bound._upperbound);
         _bound.setExact(ub._bound.isExact());
