@@ -13,8 +13,10 @@ public class Bound {
         setHotUB(0);
     }
     public double upperBound(){
-        double coldUB = _currentValue + _currentValue > _pastValue?_currentValue:_pastValue;
-        return coldUB > _upperbound?_upperbound:coldUB;
+        //double coldUB = _currentValue + _currentValue > _pastValue?_currentValue:_pastValue;
+        //return coldUB > _upperbound?_upperbound:coldUB;
+        double coldUB = _currentValue * 2;
+        return coldUB;
     }
     public boolean isExact(){
         return _exact;
