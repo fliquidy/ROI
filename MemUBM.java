@@ -34,6 +34,9 @@ public class MemUBM {
         maxUBM.remove(c);
         minUBM.remove(c);
     }
+    public double getUBValue(Cell c){
+        return maxUBM.getUB(c).upperBound();
+    }
     public UpperBound getMaxUB(){
         return maxUBM.getTopUB();
     }

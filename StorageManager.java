@@ -91,6 +91,7 @@ public class StorageManager {
 
 	public void processSpatialObject(SpatialObject o, ObjectType t){
 		StorageManager.currentTime = o._time;
+		memIdx._updatedResult = false;
 		Cell c = o.locateCell(Config._a, Config._b);
 		Cell cu = c.up();
 		Cell cr = c.right();
@@ -109,6 +110,10 @@ public class StorageManager {
 			System.out.println("Best region changed. Cell: "+memIdx._maxPosition.locateCell(Config._a, Config._b).toString());
 			System.out.println("Top-right corner: ("+memIdx._maxPosition._x+", "+memIdx._maxPosition._y+")");
 			System.out.println("Score: " + memIdx._maxPosition._weight);
+			memIdx.printCells();
+			diskIdx.printCells();
+			memIdx.listObjectsInCell(memIdx._maxPosition.locateCell(Config._a, Config._b));
+
 		}
 	}
 

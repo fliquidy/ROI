@@ -34,8 +34,6 @@ public class Test {
 						break;
 				}
 				sm.processSpatialObject(so, t);
-                System.out.print("Cells in memory: ");
-                sm.memIdx.printCells();
 
 			}
 		}

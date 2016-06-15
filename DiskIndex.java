@@ -48,7 +48,13 @@ public class DiskIndex {
         return _ubm.getTopUB().upperBound();
     }
 
-
+    public void printCells(){
+        System.out.print("Cells on disk: ");
+        for(Cell c:_ubm.mymap.keySet()){
+            System.out.print("("+c.toString()+", "+_ubm.getUB(c).upperBound()+") ");
+        }
+        System.out.println();
+    }
     public void flush(){
         BTreeMap<Cell, LinkedList<SpatialObject>> comap = _db.createTreeMap("DCell_object").makeOrGet();
         for(Cell c:_cacheObj.keySet()){
