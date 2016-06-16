@@ -12,7 +12,7 @@ public class Test {
 			StorageManager sm = new StorageManager(Type.Exact);
 			Config.setWindow(50, 50);
 			Config.setRecSize(20, 20);
-			Config.setConstraint(0.2, 0.2, 0);
+			Config.setConstraint(1, 1, 0);
 			int cnt = 0;
             while((line = bfr.readLine()) != null){
 				String[] split = line.split("\\s+");
@@ -32,6 +32,9 @@ public class Test {
 						break;
 					case 2: t = ObjectType.Expired;
 						break;
+				}
+				if(cnt == 12){
+					System.out.println();
 				}
 				sm.processSpatialObject(so, t);
 

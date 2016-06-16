@@ -49,6 +49,9 @@ public class StorageManager {
 		Cell diskC = null;
 		TwoWindowLists dtl = null;
 		System.out.println("In memory: "+memIdx._exactIndex.size()+" In disk: "+diskIdx._ubm.mymap.size());
+		if(!memIdx._ubm.check()){
+			System.out.println("not match");
+		}
 		while((!diskIdx.isEmpty()) && (memIdx.getMinUBValue() < diskIdx.getMaxUBValue() + Config._swapThreshold ||
 				memIdx._maxPosition._weight < diskIdx.getMaxUBValue()) ) {
 			if (diskC == null) {
@@ -56,9 +59,10 @@ public class StorageManager {
 			}
 			if (dtl == null) {
 				dtl = new TwoWindowLists();
+				System.out.println("retrieving "+diskC.toString());
 				dtl.load(diskIdx.getList(diskC), StorageManager.currentTime);
 			}
-			if (memIdx.size() + dtl.size() > Config._memoryConstraint) {
+			if (memIdx.size() + dtl.spaceCost() > Config._memoryConstraint) {
 				Cell memC = new Cell(memIdx.getMinUBCell());
 				TwoWindowLists mtl = memIdx._exactIndex.get(memC);
 				diskIdx.loadIntoDisk(memC, memIdx.getMinUB(), mtl);
@@ -85,6 +89,11 @@ public class StorageManager {
 			if(isFull){
 				memIdx.moveMinCellToDisk(diskIdx);
 			}
+			if(memIdx._ubm.size() == 0){
+				System.err.println("memory constraint is too small. Please allocate more memory.");
+				System.exit(0);
+			}
+
 			//System.out.println(" after: memory usage: "+memIdx.size);
 		}
 	}
@@ -97,14 +106,32 @@ public class StorageManager {
 		Cell cr = c.right();
 		Cell cur = c.upright();
 		System.out.println("Affected cells: "+c.toString()+" "+cu.toString()+" "+cr.toString()+" "+cur.toString());
+		if(!memIdx._ubm.check()){
+			System.out.println("error 1");
+		}
 		processCellObj(c, o, t);
+		if(!memIdx._ubm.check()){
+			System.out.println("error 1");
+		}
 		processCellObj(cu, o, t);
+		if(!memIdx._ubm.check()){
+			System.out.println("error 1");
+		}
 		processCellObj(cr, o, t);
+		if(!memIdx._ubm.check()){
+			System.out.println("error 1");
+		}
 		processCellObj(cur, o, t);
+		if(!memIdx._ubm.check()){
+			System.out.println("error 2");
+		}
 		while(memIdx.needToSearch() ||
 				((!diskIdx.isEmpty()) && diskIdx.getMaxUB().upperBound() > memIdx._maxPosition._weight)){
 			memIdx.search(Config._a, Config._b);
 			balance();
+		}
+		if(!memIdx._ubm.check()){
+			System.out.println("error 3");
 		}
 		if(memIdx._updatedResult){
 			System.out.println("Best region changed. Cell: "+memIdx._maxPosition.locateCell(Config._a, Config._b).toString());
@@ -113,7 +140,7 @@ public class StorageManager {
 			memIdx.printCells();
 			diskIdx.printCells();
 			memIdx.listObjectsInCell(memIdx._maxPosition.locateCell(Config._a, Config._b));
-
+			System.out.println("memory cost: "+memIdx.size);
 		}
 	}
 

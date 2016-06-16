@@ -24,6 +24,7 @@ public class DiskIndex {
         _db = DBMaker.newFileDB(new File(_dbName)).closeOnJvmShutdown().cacheDisable().make();
         _cacheObj = new HashMap<Cell, TwoWindowLists>();
         _ubm = new UpperboundManager();
+        _ubm.isMaxHeap = true;
         _time = new HashMap<Cell, Integer>();
         _cellObjMap = _db.createTreeMap(_cellObjName).makeOrGet();
         _cacheSize = 0;

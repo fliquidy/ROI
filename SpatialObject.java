@@ -20,7 +20,9 @@ public class SpatialObject implements java.io.Serializable {
 		this._weight = weight;
 		attributes = new Vector<Integer>();
 	}
-	
+	public boolean equals(SpatialObject o){
+		return this._id == o._id;
+	}
 	public Cell locateCell(double a, double b){
 		Cell c = new Cell(_x, _y, a, b);
 		return c;

@@ -27,8 +27,7 @@ public class  MemIndex {
 
 
 
-    public void searchCell(double a, double b, UpperBound ub){
-        Cell c = ub._c;
+    public void searchCell(double a, double b, Cell c){
         System.out.println("Searching "+c.toString());
         TwoWindowLists tl = _exactIndex.get(c);
         int objectNum = tl.size();
@@ -53,20 +52,19 @@ public class  MemIndex {
             _updatedResult = true;
             _isValid = true;
         }
-        ub._bound.setHotUB(bi.maxScore);
-        ub._bound.setExact(true);
-        ub._bound.setColdUB(tl._currentSum, tl._pastSum);
-        ub._p = p;
+        _ubm.setExactBound(c, bi.maxScore);
+        _ubm.setPoint(c, p);
     }
     public void printCells(){
         System.out.print("Cells in memory: ");
         for(Cell c:_exactIndex.keySet()){
-            System.out.print("("+c.toString()+", "+_ubm.getUBValue(c)+") ");
+            System.out.print("("+c.toString()+", "+_ubm.getUBValue(c)+", "+_exactIndex.get(c).size()+") ");
         }
         System.out.println();
 
     }
     public void listObjectsInCell(Cell c){
+        System.out.print("Cell "+c.toString()+" ");
         LinkedList<SpatialObject> list = _exactIndex.get(c).getListOfSpatialObject();
         System.out.print("past window:");
         for(SpatialObject o:_exactIndex.get(c)._pastWindow){
@@ -102,7 +100,8 @@ public class  MemIndex {
         */
         while((!_isValid) || _ubm.getMaxUB().upperBound() > _maxPosition._weight){
             UpperBound ub = _ubm.getMaxUB();
-            searchCell(a, b, ub);
+            System.out.println(_ubm.size()+" ubs in memory.");
+            searchCell(a, b, ub._c);
         }
     }
     public boolean needToSearch(){
@@ -113,6 +112,9 @@ public class  MemIndex {
         if(_exactIndex.containsKey(c)){
             _exactIndex.get(c).addObject(o, t);
             _ubm.updateUBforCell(c, o, t);
+            if(_exactIndex.get(c).size() == 0){
+                removeFromMemory(c);
+            }
         }
         else{
             TwoWindowLists tl = new TwoWindowLists();

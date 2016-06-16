@@ -5,7 +5,7 @@ package ROI;
  */
 public class UpperBound {
     public static int size;
-    public Bound _bound;
+    public double _bound;
     public Point _p;
     public boolean _isExact;
     public Cell _c;
@@ -17,7 +17,7 @@ public class UpperBound {
         _c = new Cell(c);
     }
     public void init(){
-        _bound = new Bound();
+        _bound = 0;
         _p = new Point(0, 0, 0);
         _isExact = false;
         _c = new Cell(0, 0);
@@ -26,33 +26,44 @@ public class UpperBound {
         _c._x = newCell._x;
         _c._y = newCell._y;
     }
-    public void setBound(double currentValue, double pastValue, double upperbound){
-        _bound.setHotUB(upperbound);
-        _bound.setColdUB(currentValue, pastValue);
+    public void setBound(double value){
+        _bound = value;
     }
-    public double upperBound(){
-        return _bound.upperBound();
-    }
+
     public void setPoint(double x, double y){
         _p._x = x;
         _p._y = y;
     }
+    public double upperBound(){
+        return _bound;
+    }
     public boolean larger(UpperBound ub){
         //TODO
-        if(this.upperBound() > ub.upperBound())return true;
+        if(_bound > ub._bound)return true;
         if(this._isExact && (!ub._isExact))return true;
         return false;
     }
+    public void update(SpatialObject o, ObjectType ot){
+        switch (ot){
+            case New:
+                _bound += 2 * o._weight/Config._currentWindow;
+                break;
+            case Old:
+                _bound -= 2 * o._weight/Config._currentWindow;
+                break;
+            case Expired:
+                break;
+        }
+    }
     public boolean smaller(UpperBound ub){
         //TODO: check which is better: with a exact small upper bound or with an approximate small upper bound
-        if(this.upperBound() < ub.upperBound())return true;
+        if(_bound < ub._bound)return true;
         if((!this._isExact) && ub._isExact)return true;
         return false;
 
     }
     public void copy(UpperBound ub){
-        setBound(ub._bound._currentValue, ub._bound._pastValue, ub._bound._upperbound);
-        _bound.setExact(ub._bound.isExact());
+        setBound(ub._bound);
         setPoint(ub._p._x, ub._p._y);
         setCell(ub._c);
     }

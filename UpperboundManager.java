@@ -30,6 +30,23 @@ public class UpperboundManager {
 
         return myheap.get(mymap.get(c));
     }
+    public void setExactBound(Cell c, double bound){
+        int idx = 0;
+        if(mymap.containsKey(c)){
+            idx = mymap.get(c);
+        }
+        else{
+            System.err.println("Cell "+c.toString()+" is not in memory.");
+        }
+        myheap.get(idx)._bound = bound;
+        myheap.get(idx)._isExact = true;
+        if(isMaxHeap){
+            updateMaxHeap(idx);
+        }
+        else{
+            updateMinHeap(idx);
+        }
+    }
     public void updateUBforCell(Cell c, SpatialObject o, ObjectType ot){
         int idx = 0;
         if(mymap.containsKey(c)){
@@ -42,7 +59,7 @@ public class UpperboundManager {
             myheap.add(ub);
             mymap.put(c, idx);
         }
-        myheap.get(idx)._bound.update(o, ot);
+        myheap.get(idx).update(o, ot);
         if(isMaxHeap){
             updateMaxHeap(idx);
         }
@@ -51,7 +68,7 @@ public class UpperboundManager {
         }
     }
     public void addCell(Cell c, UpperBound ub){
-        int idx = mymap.size();
+        int idx = myheap.size();
         myheap.add(ub);
         mymap.put(c, idx);
         if(isMaxHeap){
@@ -90,7 +107,7 @@ public class UpperboundManager {
         }
         return myheap.get(1);
     }
-    private void updateMinHeap(int index){
+    public void updateMinHeap(int index){
         int father = index/2;
         int lchild = index * 2;
         int rchild = index * 2 + 1;
@@ -133,6 +150,9 @@ public class UpperboundManager {
             }
         }
     }
+    public int size(){
+        return myheap.size() - 1;
+    }
     public void remove(Cell c){
         if(!mymap.containsKey(c)){
             System.err.println("Cell "+c.toString()+" is not found.");
@@ -157,7 +177,7 @@ public class UpperboundManager {
             }
         }
     }
-    private void updateMaxHeap(int index){
+    public void updateMaxHeap(int index){
         int father = index/2;
         int lchild = index * 2;
         int rchild = index * 2 + 1;
@@ -203,7 +223,7 @@ public class UpperboundManager {
 
     public void print(){
         for(int i=1; i < myheap.size(); i++){
-            System.out.print("["+myheap.get(i)._c.toString()+", "+myheap.get(i)._bound.toString()+"] ");
+            System.out.print("["+myheap.get(i)._c.toString()+", "+myheap.get(i)._bound+"] ");
         }
         System.out.println();
     }

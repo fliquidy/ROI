@@ -1,5 +1,8 @@
 package ROI;
 
+import java.util.Iterator;
+import java.util.ListIterator;
+
 /**
  * Created by Kaiyu on 6/8/2016.
  */
@@ -22,6 +25,54 @@ public class MemUBM {
         maxUBM.addCell(c, ub);
         minUBM.addCell(c, ub);
     }
+    public boolean check(){
+        boolean flag = true;
+        if(maxUBM.myheap.size() != minUBM.myheap.size()){
+            flag = false;
+            System.err.println("myheap size not match.");
+        }
+        if(maxUBM.mymap.size() != minUBM.mymap.size()){
+            flag = false;
+            System.err.println("mymap size not match.");
+        }
+        if(maxUBM.myheap.size() - 1 != maxUBM.mymap.size()){
+            flag = false;
+            System.err.println("myheap mymap not match");
+        }
+        ListIterator<UpperBound> it = maxUBM.myheap.listIterator();
+        it.next();
+        while(it.hasNext()){
+            UpperBound ub = it.next();
+            if(!maxUBM.mymap.containsKey(ub._c)){
+                System.err.println("maxUBM "+ub._c);
+                flag = false;
+            }
+        }
+        it = minUBM.myheap.listIterator();
+        it.next();
+        while(it.hasNext()){
+            UpperBound ub = it.next();
+            if(!minUBM.mymap.containsKey(ub._c)){
+                System.err.println("minUBM " + ub._c);
+                flag = false;
+            }
+        }
+        for(Cell c:maxUBM.mymap.keySet()){
+            int idx = maxUBM.mymap.get(c);
+            if(!c.equals(maxUBM.myheap.get(idx)._c)){
+                System.out.println("maxUBM mapping not correct "+c.toString());
+                flag = false;
+            }
+        }
+        for(Cell c:minUBM.mymap.keySet()){
+            int idx = minUBM.mymap.get(c);
+            if(!c.equals(minUBM.myheap.get(idx)._c)){
+                System.out.println("minUBM mapping not correct "+c.toString());
+                flag = false;
+            }
+        }
+        return flag;
+    }
     public void updateUBforCell(Cell c, SpatialObject o, ObjectType ot){
         maxUBM.updateUBforCell(c, o, ot);
         minUBM.updateUBforCell(c, o, ot);
@@ -33,6 +84,20 @@ public class MemUBM {
     public void remove(Cell c){
         maxUBM.remove(c);
         minUBM.remove(c);
+    }
+    public void setExactBound(Cell c, double bound){
+        maxUBM.setExactBound(c, bound);
+        minUBM.setExactBound(c, bound);
+    }
+    public void setPoint(Cell c, Point p){
+        maxUBM.getUB(c).setPoint(p._x, p._y);
+        minUBM.getUB(c).setPoint(p._x, p._y);
+    }
+    public int size(){
+        if(maxUBM.size() != minUBM.size()){
+            System.err.println("maxUBM and minUBM don't match.");
+        }
+        return maxUBM.size();
     }
     public double getUBValue(Cell c){
         return maxUBM.getUB(c).upperBound();

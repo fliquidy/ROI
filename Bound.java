@@ -7,7 +7,6 @@ public class Bound {
     double _currentValue;
     double _pastValue;
     double _upperbound;
-    boolean _exact;
     public Bound(){
         setColdUB(0, 0);
         setHotUB(0);
@@ -15,9 +14,6 @@ public class Bound {
     public double upperBound(){
         double coldUB = _currentValue * 2;
         return coldUB;
-    }
-    public boolean isExact(){
-        return _exact;
     }
 
     public void setColdUB(double current, double past){
@@ -28,9 +24,6 @@ public class Bound {
         _upperbound = ub;
     }
 
-    public void setExact(boolean exact){
-        _exact = exact;
-    }
 
     public void updateNew(double value){
         _currentValue += value/Config._currentWindow;
@@ -60,7 +53,6 @@ public class Bound {
             case Expired: updateExpired(o._weight);
                 break;
         }
-        _exact = false;
     }
     public String toString(){
         return String.format("[%f, %f | %f]", _currentValue, _pastValue, _upperbound);
