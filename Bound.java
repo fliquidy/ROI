@@ -12,8 +12,7 @@ public class Bound {
         setHotUB(0);
     }
     public double upperBound(){
-        double coldUB = _currentValue * 2;
-        return coldUB;
+        return 2 * _currentValue > _upperbound ? _upperbound : 2 * _currentValue;
     }
 
     public void setColdUB(double current, double past){

@@ -17,6 +17,9 @@ public class Test {
             while((line = bfr.readLine()) != null){
 				String[] split = line.split("\\s+");
                 System.out.println(cnt+": processing: "+line);
+				if(cnt == 11){
+					System.out.println();
+				}
                 cnt ++;
 				int time = Integer.parseInt(split[0]);
 				int id = Integer.parseInt(split[1]);
@@ -33,9 +36,7 @@ public class Test {
 					case 2: t = ObjectType.Expired;
 						break;
 				}
-				if(cnt == 12){
-					System.out.println();
-				}
+
 				sm.processSpatialObject(so, t);
 
 			}
