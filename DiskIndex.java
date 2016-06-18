@@ -17,7 +17,7 @@ public class DiskIndex {
     public HashMap<Cell, Integer> _time;
     public double _cacheSize;
 
-    public static String _dbName = "roi";
+    public static String _dbName = "c:\\users\\kaiyu\\Documents\\roi";
     public static String _cellObjName = "cell_list";
 
     public DiskIndex(){

@@ -38,8 +38,7 @@ public class UpperboundManager {
         else{
             System.err.println("Cell "+c.toString()+" is not in memory.");
         }
-        myheap.get(idx)._bound = bound;
-        myheap.get(idx)._isExact = true;
+        myheap.get(idx).setHotBound(bound);
         if(isMaxHeap){
             updateMaxHeap(idx);
         }
@@ -223,7 +222,7 @@ public class UpperboundManager {
 
     public void print(){
         for(int i=1; i < myheap.size(); i++){
-            System.out.print("["+myheap.get(i)._c.toString()+", "+myheap.get(i)._bound+"] ");
+            System.out.print("["+myheap.get(i)._c.toString()+", "+myheap.get(i).upperBound()+"] ");
         }
         System.out.println();
     }

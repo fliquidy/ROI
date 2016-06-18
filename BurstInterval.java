@@ -67,7 +67,7 @@ public class BurstInterval {
                     pastWeight[idx] += interval.value;
                 }
             }
-            double score = Math.abs(pastWeight[idx]) + currentWeight[idx];
+            double score = pastWeight[idx] > 0 ? pastWeight[idx]: 0 + currentWeight[idx];
             if(score > maxScore){
                 maxX = dicriminant[idx];
                 maxY = (interval.y+nextY)/2;

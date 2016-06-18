@@ -9,7 +9,6 @@ public class UpperBound {
     public double _hotBound;
     public Point _p;
     public boolean _isExact;
-    public boolean _valid;
     public Cell _c;
     public UpperBound(){
         init();
@@ -34,6 +33,7 @@ public class UpperBound {
     }
     public void setHotBound(double value){
         _hotBound = value;
+        _isExact = true;
     }
 
     public void setPoint(double x, double y){
@@ -41,7 +41,7 @@ public class UpperBound {
         _p._y = y;
     }
     public double upperBound(){
-        if(_valid){
+        if(_isExact){
             return _coldBound > _hotBound ? _hotBound:_coldBound;
         }
         else{
@@ -62,24 +62,33 @@ public class UpperBound {
         switch (ot){
 
             case New:
-                _bound += 2 * o._weight/Config._currentWindow;
+                _coldBound += 2 * o._weight/Config._currentWindow;
+                _hotBound += 2 * o._weight / Config._currentWindow;
                 break;
             case Old:
-                _bound -= 2 * o._weight/Config._currentWindow;
+                _coldBound -= 2 * o._weight/Config._currentWindow;
+                if(cover){
+                    _hotBound -= o._weight/Config._currentWindow;
+                }
+                else{
+                    _isExact = false;
+                }
                 break;
             case Expired:
                 break;
         }
+
     }
     public boolean smaller(UpperBound ub){
         //TODO: check which is better: with a exact small upper bound or with an approximate small upper bound
-        if(_bound < ub._bound)return true;
+        if(upperBound() < ub.upperBound())return true;
         if((!this._isExact) && ub._isExact)return true;
         return false;
 
     }
     public void copy(UpperBound ub){
-        setBound(ub._bound);
+        setColdBound(ub._coldBound);
+        setHotBound(ub._hotBound);
         setPoint(ub._p._x, ub._p._y);
         setCell(ub._c);
     }
