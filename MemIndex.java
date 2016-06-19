@@ -43,7 +43,9 @@ public class  MemIndex {
             bi.insertInterval(current, next.y);
             current = next;
         }
-        bi.insertInterval(current, current.y+1.0);
+        if(current != null) {
+            bi.insertInterval(current, current.y + 1.0);
+        }
         System.out.println("maxScore: "+bi.maxScore);
         Point p = new Point(bi.maxX, bi.maxY, bi.maxScore);
         if((!_isValid) || (bi.maxScore > _maxPosition._weight)){
@@ -80,6 +82,15 @@ public class  MemIndex {
             System.out.print(" id: "+o._id);
         }
         System.out.println();
+    }
+    public void check(Cell c){
+        double cub = _ubm.getUB(c)._coldBound;
+        int cnum = _exactIndex.get(c)._currentWindow.size();
+        System.out.println("ub check: "+cub + " "+cnum/25.0);
+        if(Math.abs(cub - 1.0 * cnum / 25) > 0.0001){
+            System.out.println("#$#$# Error "+c.toString());
+            System.exit(0);
+        }
     }
     public void checkObjects(Cell c, Point p){
         ListIterator<SpatialObject> it = _exactIndex.get(c)._currentWindow.listIterator();
@@ -161,6 +172,7 @@ public class  MemIndex {
                 c.equals(_maxPosition.locateCell(Config._a, Config._b))){
             _isValid = false;
         }
+        check(c);
         return size >= Config._memoryConstraint;
     }
     public void removeFromMemory(Cell c){

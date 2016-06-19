@@ -13,7 +13,7 @@ public class DiskIndex {
     public UpperboundManager _ubm;
     public DB _db;
     public BTreeMap<Cell, LinkedList<SpatialObject>> _cellObjMap;
-    public HashMap<Cell, TwoWindowLists> _cacheObj;
+    public HashMap<Cell, LinkedList<SpatialObject>> _cacheObj;
     public HashMap<Cell, Integer> _time;
     public double _cacheSize;
 
@@ -22,7 +22,7 @@ public class DiskIndex {
 
     public DiskIndex(){
         _db = DBMaker.newFileDB(new File(_dbName)).closeOnJvmShutdown().cacheDisable().make();
-        _cacheObj = new HashMap<Cell, TwoWindowLists>();
+        _cacheObj = new HashMap<Cell, LinkedList<SpatialObject>>();
         _ubm = new UpperboundManager();
         _ubm.isMaxHeap = true;
         _time = new HashMap<Cell, Integer>();
@@ -59,41 +59,29 @@ public class DiskIndex {
     public void flush(){
         BTreeMap<Cell, LinkedList<SpatialObject>> comap = _db.createTreeMap("DCell_object").makeOrGet();
         for(Cell c:_cacheObj.keySet()){
-            TwoWindowLists tl = _cacheObj.get(c);
-            if(tl.size() == 0){
+            LinkedList<SpatialObject> list = _cacheObj.get(c);
+            if(list.size() == 0){
                 continue;
             }
             if(_time.containsKey(c) && StorageManager.currentTime - _time.get(c) > (Config._pastWindow + Config._currentWindow)){
-                comap.put(c, tl.getListOfSpatialObject());
+                comap.put(c, list);
             }
             else{
                 LinkedList<SpatialObject> l = comap.get(c);
                 if(l == null){
-                    l = tl.getListOfSpatialObject();
+                    l = list;
                 }
                 else{
                     while((!l.isEmpty()) && (StorageManager.currentTime - l.getFirst()._time > (Config._pastWindow + Config._currentWindow))){
                         l.removeFirst();
                     }
-                    l.addAll(tl.getListOfSpatialObject());
+                    l.addAll(list);
                 }
 
                 comap.put(c, l);
             }
-            int time = tl.mostRecentTime();
-            if(time < 0){
-                System.out.print("past window: ");
-                for(SpatialObject o : tl._pastWindow){
-                    System.out.print(o._id+ " ");
-                }
-                System.out.println();
-                System.out.print("current window: ");
-                for(SpatialObject o : tl._currentWindow){
-                    System.out.print(o._id+" ");
-                }
-                System.out.println();
-            }
-            _time.put(c, tl.mostRecentTime());
+            int time = list.getLast()._time;
+            _time.put(c, time);
         }
         _cacheObj.clear();
         _db.commit();
@@ -119,17 +107,22 @@ public class DiskIndex {
     }
     public void loadIntoDisk(Cell memC, UpperBound ub, TwoWindowLists tl){
         _ubm.addCell(memC, ub);
-        _cellObjMap.put(memC, tl.getListOfSpatialObject());
+        _cacheObj.put(memC, tl.getListOfSpatialObject());
+        _cacheSize += tl._spaceCost;
+        if(_cacheSize > Config._cacheConstraint){
+            flush();
+        }
     }
     public void remove(Cell c){
         _ubm.remove(c);
-    }
-    public void writeToMemory(Cell diskC, MemIndex memIdx){
-
+        if(_time.containsKey(c)){
+            _time.remove(c);
+        }
     }
     public TwoWindowLists getTwoWindowLists(Cell c){
         TwoWindowLists tl = new TwoWindowLists();
         LinkedList<SpatialObject> list = getList(c);
+        if(list != null){
         for(SpatialObject o : list){
             if(StorageManager.currentTime - o._time < Config._currentWindow + Config._pastWindow
                     && StorageManager.currentTime - o._time > Config._currentWindow){
@@ -143,16 +136,19 @@ public class DiskIndex {
                 tl._spaceCost += o.size();
             }
         }
+        }
         if(_cacheObj.containsKey(c)) {
-            for (SpatialObject o : _cacheObj.get(c)._pastWindow) {
-                tl._pastWindow.addLast(o);
-                tl._pastSum += o._weight / Config._pastWindow;
-                tl._spaceCost += o.size();
-            }
-            for (SpatialObject o : _cacheObj.get(c)._currentWindow) {
-                tl._currentWindow.addLast(o);
-                tl._currentSum += o._weight / Config._currentWindow;
-                tl._spaceCost += o.size();
+            for (SpatialObject o : _cacheObj.get(c)) {
+                if (StorageManager.currentTime - o._time < Config._currentWindow + Config._pastWindow
+                        && StorageManager.currentTime - o._time > Config._currentWindow) {
+                    tl._pastWindow.addLast(o);
+                    tl._pastSum += o._weight / Config._pastWindow;
+                    tl._spaceCost += o.size();
+                } else if (StorageManager.currentTime - o._time < Config._currentWindow) {
+                    tl._currentWindow.addLast(o);
+                    tl._currentSum += o._weight / Config._currentWindow;
+                    tl._spaceCost += o.size();
+                }
             }
             _cacheObj.remove(c);
         }
@@ -162,24 +158,29 @@ public class DiskIndex {
         _db.commit();
     }
     public void insertIntoIndex(SpatialObject o, Cell c, ObjectType t){
-        TwoWindowLists list = null;
+        LinkedList<SpatialObject> list;
         if(_cacheObj.containsKey(c)){
             list = _cacheObj.get(c);
         }
         else{
-            list = new TwoWindowLists();
+            list = new LinkedList<SpatialObject>();
             _cacheObj.put(c, list);
         }
-        list.addObject(o, t);
-        _ubm.updateUBforCell(c, o, t);
-        switch (t){
-            case New: _cacheSize += o.size();
-                break;
-            case Expired: _cacheSize -= o.size();
-                break;
-            default:
-                break;
+        if(t == ObjectType.New){
+            list.addLast(o);
+            _cacheSize += o.size();
         }
+       // if(t == ObjectType.Expired){
+        //    if((!list.isEmpty()) && list.getFirst()._id == o._id){
+         //       list.removeFirst();
+          //  }
+        //}
+        while((!list.isEmpty()) && StorageManager.currentTime - list.getFirst()._time >= Config._currentWindow + Config._pastWindow){
+            _cacheSize -= list.getFirst().size();
+            list.removeFirst();
+
+        }
+        _ubm.updateUBforCell(c, o, t);
         if(_cacheSize >= Config._cacheConstraint){
             flush();
         }

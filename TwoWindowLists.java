@@ -36,15 +36,11 @@ public class TwoWindowLists {
             }
         }
     }
-    public void transform(SpatialObject o){
-        if(!_currentWindow.isEmpty()){
-            SpatialObject o1 = _currentWindow.getFirst();
-            if(o1.equals(o)){
-                _currentWindow.removeFirst();
-                _currentSum -= o._weight/Config._currentWindow;
-            }
-        }
+    public void transform(SpatialObject oldO){
+        SpatialObject o = _currentWindow.getFirst();
         _pastWindow.addLast(o);
+        _currentWindow.removeFirst();
+        _currentSum -= o._weight/Config._currentWindow;
         _pastSum += o._weight/Config._pastWindow;
     }
     public void addObject(SpatialObject o, ObjectType ot){
