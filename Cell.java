@@ -13,8 +13,18 @@ public class Cell implements java.io.Serializable, java.lang.Comparable<Cell>{
 		this._y = y;
 	}
 	public Cell(double x, double y, double a, double b){
-		_x = (int)(x/b);
-		_y = (int)(y/a);
+		if(x >= 0){
+			_x = (int)(x/b);
+		}
+		else{
+			_x = (int)(x/b) - 1;
+		}
+		if(y >= 0){
+			_y = (int)(y/a);
+		}
+		else{
+			_y = (int)(y/a) - 1;
+		}
 	}
 	public boolean equals(Object obj){
 		if(obj instanceof Cell){

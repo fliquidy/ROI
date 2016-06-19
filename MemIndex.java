@@ -31,8 +31,8 @@ public class  MemIndex {
         System.out.println("Searching "+c.toString());
         TwoWindowLists tl = _exactIndex.get(c);
         int objectNum = tl.size();
-        LinkedList<Interval> intervals = tl.getIntervals(a, b);
-        double[] coords = tl.getXCoords(b);
+        LinkedList<Interval> intervals = tl.getIntervals(a, b, c._y * a, c._y * a + a);
+        double[] coords = tl.getXCoords(b, c._x*b, c._x*b + b);
         BurstInterval bi = new BurstInterval(coords);
         Iterator<Interval> it = intervals.listIterator();
         Interval current = null;
@@ -44,6 +44,7 @@ public class  MemIndex {
             current = next;
         }
         bi.insertInterval(current, current.y+1.0);
+        System.out.println("maxScore: "+bi.maxScore);
         Point p = new Point(bi.maxX, bi.maxY, bi.maxScore);
         if((!_isValid) || (bi.maxScore > _maxPosition._weight)){
             _maxPosition._weight = bi.maxScore;
@@ -54,6 +55,9 @@ public class  MemIndex {
         }
         _ubm.setExactBound(c, bi.maxScore);
         _ubm.setPoint(c, p);
+        checkObjects(c, p);
+        System.out.println(_ubm.getUB(c)._coldBound+" "+_ubm.getUB(c)._hotBound);
+        System.out.println(_exactIndex.get(c).size());
     }
     public void printCells(){
         System.out.print("Cells in memory: ");
@@ -76,6 +80,27 @@ public class  MemIndex {
             System.out.print(" id: "+o._id);
         }
         System.out.println();
+    }
+    public void checkObjects(Cell c, Point p){
+        ListIterator<SpatialObject> it = _exactIndex.get(c)._currentWindow.listIterator();
+        System.out.println("@#@#");
+        System.out.print("Current:");
+        while(it.hasNext()){
+            SpatialObject o = it.next();
+            if(Math.abs(o._x - p._x) <= Config._b && Math.abs(o._y - p._y) <= Config._a){
+                System.out.print(" "+o._id);
+            }
+        }
+        System.out.println();
+        it = _exactIndex.get(c)._pastWindow.listIterator();
+        System.out.print("past:");
+        while(it.hasNext()){
+            SpatialObject o = it.next();
+            if(Math.abs(o._x - p._x) <= Config._b && Math.abs(o._y - p._y) <= Config._a){
+                System.out.print(" "+o._id);
+            }
+        }
+        System.out.println("\n@#@#");
     }
 
     /*******************************************/
@@ -130,8 +155,10 @@ public class  MemIndex {
             default:
                 break;
         }
+        Cell c1 = o.locateCell(Config._a, Config._b);
+        Cell c2 = _maxPosition.locateCell(Config._a, Config._b);
         if(_maxPosition != null &&
-                o.locateCell(Config._a, Config._b).equals(_maxPosition.locateCell(Config._a, Config._b))){
+                c.equals(_maxPosition.locateCell(Config._a, Config._b))){
             _isValid = false;
         }
         return size >= Config._memoryConstraint;

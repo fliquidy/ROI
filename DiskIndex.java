@@ -127,6 +127,36 @@ public class DiskIndex {
     public void writeToMemory(Cell diskC, MemIndex memIdx){
 
     }
+    public TwoWindowLists getTwoWindowLists(Cell c){
+        TwoWindowLists tl = new TwoWindowLists();
+        LinkedList<SpatialObject> list = getList(c);
+        for(SpatialObject o : list){
+            if(StorageManager.currentTime - o._time < Config._currentWindow + Config._pastWindow
+                    && StorageManager.currentTime - o._time > Config._currentWindow){
+                tl._pastWindow.addLast(o);
+                tl._pastSum += o._weight / Config._pastWindow;
+                tl._spaceCost += o.size();
+            }
+            else if(StorageManager.currentTime - o._time < Config._currentWindow){
+                tl._currentWindow.addLast(o);
+                tl._currentSum += o._weight/Config._currentWindow;
+                tl._spaceCost += o.size();
+            }
+        }
+        if(_cacheObj.containsKey(c)) {
+            for (SpatialObject o : _cacheObj.get(c)._pastWindow) {
+                tl._pastWindow.addLast(o);
+                tl._pastSum += o._weight / Config._pastWindow;
+                tl._spaceCost += o.size();
+            }
+            for (SpatialObject o : _cacheObj.get(c)._currentWindow) {
+                tl._currentWindow.addLast(o);
+                tl._currentSum += o._weight / Config._currentWindow;
+                tl._spaceCost += o.size();
+            }
+        }
+        return tl;
+    }
     public void commit(){
         _db.commit();
     }

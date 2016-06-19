@@ -1,9 +1,9 @@
 package ROI;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
+import sun.awt.image.ImageWatched;
+
+import java.util.*;
+
 /**
  * Created by kaiyu on 5/9/2016.
  */
@@ -57,6 +57,7 @@ public class TwoWindowLists {
                 break;
         }
     }
+
     public void load(LinkedList<SpatialObject> list, int currentTime){
         for(SpatialObject o : list){
             if(currentTime - o._time < Config._currentWindow + Config._pastWindow
@@ -91,37 +92,75 @@ public class TwoWindowLists {
         list.addAll(_currentWindow);
         return list;
     }
-    public LinkedList<Interval> getIntervals(double a, double b) {
+    public LinkedList<Interval> getIntervals(double a, double b, double bottom, double top) {
         LinkedList<Interval> list = new LinkedList<>();
         for (SpatialObject o : _pastWindow) {
-            Interval itUp = new Interval(o._x, o._x+b, o._y, o._weight/Config._pastWindow, ObjectType.Old, EdgeType.Up);
-            Interval itDown = new Interval(o._x, o._x+b, o._y + a, o._weight/Config._pastWindow, ObjectType.Old, EdgeType.Down);
+            Interval itUp, itDown;
+            if(o._y > bottom){
+                itUp = new Interval(o._x, o._x+b, o._y, o._weight/Config._pastWindow, ObjectType.Old, EdgeType.Up);
+            }
+            else{
+                itUp = new Interval(o._x, o._x + b, bottom, o._weight/Config._pastWindow, ObjectType.Old, EdgeType.Up);
+            }
+            if(o._y + a < top){
+                itDown = new Interval(o._x, o._x+b, o._y + a, o._weight/Config._pastWindow, ObjectType.Old, EdgeType.Down);
+            }
+            else{
+                itDown = new Interval(o._x, o._x+b, top, o._weight/Config._pastWindow, ObjectType.Old, EdgeType.Down);
+            }
             list.add(itUp);
             list.add(itDown);
         }
         for(SpatialObject o: _currentWindow){
-            Interval itUp = new Interval(o._x, o._x+b, o._y, o._weight/Config._currentWindow, ObjectType.New, EdgeType.Up);
-            Interval itDown = new Interval(o._x, o._x+b, o._y + a, o._weight/Config._currentWindow, ObjectType.New, EdgeType.Down);
+            Interval itUp, itDown;
+            if(o._y > bottom){
+                itUp = new Interval(o._x, o._x+b, o._y, o._weight/Config._currentWindow, ObjectType.New, EdgeType.Up);
+            }
+            else{
+                itUp = new Interval(o._x, o._x + b, bottom, o._weight/Config._currentWindow, ObjectType.New, EdgeType.Up);
+            }
+            if(o._y + a < top){
+                itDown = new Interval(o._x, o._x+b, o._y + a, o._weight/Config._currentWindow, ObjectType.New, EdgeType.Down);
+            }
+            else{
+                itDown = new Interval(o._x, o._x+b, top, o._weight/Config._currentWindow, ObjectType.New, EdgeType.Down);
+            }
             list.add(itUp);
             list.add(itDown);
         }
         Collections.sort(list);
         return list;
     }
-    public double[] getXCoords(double b){
-        double[] xcoords = new double[size()*2];
+    public double[] getXCoords(double b, double l, double r){
         int idx = 0;
         Iterator<SpatialObject> x = _pastWindow.listIterator(0);
+        LinkedList<Double> candidates = new LinkedList<>();
         while(x.hasNext()){
             SpatialObject o = x.next();
-            xcoords[idx++] = o._x;
-            xcoords[idx++] = o._x + b;
+            if(o._x > l){
+                candidates.addLast(o._x);
+            }
+            if(o._x + b < r){
+                candidates.addLast(o._x + b);
+            }
         }
         x = _currentWindow.listIterator(0);
         while(x.hasNext()){
             SpatialObject o = x.next();
-            xcoords[idx++] = o._x;
-            xcoords[idx++] = o._x + b;
+            if(o._x > l){
+                candidates.addLast(o._x);
+            }
+            if(o._x + b < r){
+                candidates.addLast(o._x + b);
+            }
+        }
+        candidates.addLast(l);
+        candidates.addLast(r);
+        double[] xcoords = new double[candidates.size()];
+        ListIterator<Double> it = candidates.listIterator();
+        idx = 0;
+        while(it.hasNext()){
+            xcoords[idx++] = it.next();
         }
         Arrays.sort(xcoords);
         return xcoords;
@@ -153,7 +192,7 @@ public class TwoWindowLists {
         tl.add(new SpatialObject(2, 2, 2.0, 2.0, 2.0));
         tl.print();
         tl.print();
-        double[] xcoords = tl.getXCoords(0.5);
+        double[] xcoords = tl.getXCoords(0.5, 1, 1);
         Config c = new Config();
         c.setWindow(1, 1);
         System.out.println(Config._currentWindow+" "+Config._pastWindow);

@@ -58,9 +58,8 @@ public class StorageManager {
 				diskC = new Cell(diskIdx.getMaxUBCell());
 			}
 			if (dtl == null) {
-				dtl = new TwoWindowLists();
+				dtl = diskIdx.getTwoWindowLists(diskC);
 				System.out.println("retrieving "+diskC.toString());
-				dtl.load(diskIdx.getList(diskC), StorageManager.currentTime);
 			}
 			if (memIdx.size() + dtl.spaceCost() > Config._memoryConstraint) {
 				Cell memC = new Cell(memIdx.getMinUBCell());

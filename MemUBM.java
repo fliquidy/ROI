@@ -22,8 +22,12 @@ public class MemUBM {
         minUBM.isMaxHeap = false;
     }
     public void addCell(Cell c, UpperBound ub){
-        maxUBM.addCell(c, ub);
-        minUBM.addCell(c, ub);
+        UpperBound ubMax = new UpperBound();
+        UpperBound ubMin = new UpperBound();
+        ubMax.copy(ub);
+        ubMin.copy(ub);
+        maxUBM.addCell(c, ubMax);
+        minUBM.addCell(c, ubMin);
     }
     public boolean check(){
         boolean flag = true;
