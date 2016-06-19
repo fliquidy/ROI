@@ -55,10 +55,6 @@ public class UpperBound {
         return false;
     }
     public void update(SpatialObject o, ObjectType ot){
-        if(_c._x == 3 && _c._y == -3){
-            System.out.println("**********");
-            System.out.println(_hotBound+ " "+_coldBound);
-        }
         boolean cover = false;
         if(Math.abs(o._x - _p._x) < Config._b && Math.abs(o._y - _p._y) < Config._a){
             cover = true;
@@ -87,10 +83,6 @@ public class UpperBound {
                     _isExact = false;
                 }
                 break;
-        }
-        if(_c._x == 3 && _c._y == -3){
-            System.out.println(_coldBound);
-            System.out.println("**********");
         }
         if(upperBound() < -0.001){
             System.out.println("ERROR@@@"+_c.toString()+" "+_coldBound+" "+_hotBound+" "+_isExact);

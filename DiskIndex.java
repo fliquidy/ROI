@@ -154,6 +154,7 @@ public class DiskIndex {
                 tl._currentSum += o._weight / Config._currentWindow;
                 tl._spaceCost += o.size();
             }
+            _cacheObj.remove(c);
         }
         return tl;
     }

@@ -76,9 +76,6 @@ public class StorageManager {
 		}
 	}
 	public void processCellObj(Cell c, SpatialObject o, ObjectType ot){
-		if(c._x == 2 && c._y == -4){
-			System.out.println();
-		}
 		if(diskIdx.containCell(c) || //cell in disk
 				((!memIdx.containCell(c)) && memIdx.size > Config._memoryConstraint) // cell not in memory and memory is full
 				)	{
