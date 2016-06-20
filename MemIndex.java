@@ -28,9 +28,8 @@ public class  MemIndex {
 
 
     public void searchCell(double a, double b, Cell c){
-        System.out.println("Searching "+c.toString());
+        //System.out.println("Searching "+c.toString());
         TwoWindowLists tl = _exactIndex.get(c);
-        int objectNum = tl.size();
         LinkedList<Interval> intervals = tl.getIntervals(a, b, c._y * a, c._y * a + a);
         double[] coords = tl.getXCoords(b, c._x*b, c._x*b + b);
         BurstInterval bi = new BurstInterval(coords);
@@ -46,8 +45,8 @@ public class  MemIndex {
         if(current != null) {
             bi.insertInterval(current, current.y + 1.0);
         }
-        System.out.println("maxScore: "+bi.maxScore);
-        Point p = null;
+        //System.out.println("maxScore: "+bi.maxScore);
+        Point p;
         if(bi.found){
             p = new Point(bi.maxX, bi.maxY, bi.maxScore);
         }
@@ -63,10 +62,10 @@ public class  MemIndex {
         }
         _ubm.setExactBound(c, p._weight);
         _ubm.setPoint(c, p);
-        checkObjects(c, p);
-        System.out.println(_ubm.getUB(c)._coldBound+" "+_ubm.getUB(c)._hotBound);
-        System.out.println(_exactIndex.get(c).size());
     }
+    /*
+    For testing
+     */
     public void printCells(){
         System.out.print("Cells in memory: ");
         for(Cell c:_exactIndex.keySet()){
@@ -142,7 +141,7 @@ public class  MemIndex {
         */
         while((!_isValid) || _ubm.getMaxUB().upperBound() > _maxPosition._weight){
             UpperBound ub = _ubm.getMaxUB();
-            System.out.println(_ubm.size()+" ubs in memory.");
+            //System.out.println(_ubm.size()+" ubs in memory.");
             searchCell(a, b, ub._c);
         }
     }

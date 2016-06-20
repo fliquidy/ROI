@@ -48,10 +48,10 @@ public class StorageManager {
 		//balance cells between memory and disk
 		Cell diskC = null;
 		TwoWindowLists dtl = null;
-		System.out.println("In memory: "+memIdx._exactIndex.size()+" In disk: "+diskIdx._ubm.mymap.size());
-		if(!memIdx._ubm.check()){
-			System.out.println("not match");
-		}
+		//System.out.println("In memory: "+memIdx._exactIndex.size()+" In disk: "+diskIdx._ubm.mymap.size());
+		//if(!memIdx._ubm.check()){
+		//	System.out.println("not match");
+		//}
 		while((!diskIdx.isEmpty()) && (memIdx.getMinUBValue() < diskIdx.getMaxUBValue() + Config._swapThreshold ||
 				memIdx._maxPosition._weight < diskIdx.getMaxUBValue()) ) {
 			if (diskC == null) {
@@ -59,7 +59,7 @@ public class StorageManager {
 			}
 			if (dtl == null) {
 				dtl = diskIdx.getTwoWindowLists(diskC);
-				System.out.println("retrieving "+diskC.toString());
+				//System.out.println("retrieving "+diskC.toString());
 			}
 			if (memIdx.size() + dtl.spaceCost() > Config._memoryConstraint) {
 				Cell memC = new Cell(memIdx.getMinUBCell());
@@ -104,41 +104,38 @@ public class StorageManager {
 		Cell cu = c.up();
 		Cell cr = c.right();
 		Cell cur = c.upright();
-		System.out.println("Affected cells: "+c.toString()+" "+cu.toString()+" "+cr.toString()+" "+cur.toString());
-		if(!memIdx._ubm.check()){
-			System.out.println("error 1");
-		}
+		//System.out.println("Affected cells: "+c.toString()+" "+cu.toString()+" "+cr.toString()+" "+cur.toString());
+		//if(!memIdx._ubm.check()){
+		//	System.out.println("error 1");
+		//}
 		processCellObj(c, o, t);
-		if(!memIdx._ubm.check()){
-			System.out.println("error 1");
-		}
+		//if(!memIdx._ubm.check()){
+		//	System.out.println("error 1");
+		//}
 		processCellObj(cu, o, t);
-		if(!memIdx._ubm.check()){
-			System.out.println("error 1");
-		}
+		//if(!memIdx._ubm.check()){
+		//	System.out.println("error 1");
+		//}
 		processCellObj(cr, o, t);
-		if(!memIdx._ubm.check()){
-			System.out.println("error 1");
-		}
+		//if(!memIdx._ubm.check()){
+		//	System.out.println("error 1");
+		//}
 		processCellObj(cur, o, t);
-		if(!memIdx._ubm.check()){
-			System.out.println("error 2");
-		}
+		//if(!memIdx._ubm.check()){
+		//	System.out.println("error 2");
+		//}
 		while(memIdx.needToSearch() ||
 				((!diskIdx.isEmpty()) && diskIdx.getMaxUB().upperBound() > memIdx._maxPosition._weight)){
 			memIdx.search(Config._a, Config._b);
 			balance();
 		}
-		if(!memIdx._ubm.check()){
-			System.out.println("error 3");
-		}
 		if(memIdx._updatedResult){
 			System.out.println("Best region changed. Cell: "+memIdx._maxPosition.locateCell(Config._a, Config._b).toString());
 			System.out.println("Top-right corner: ("+memIdx._maxPosition._x+", "+memIdx._maxPosition._y+")");
 			System.out.println("Score: " + memIdx._maxPosition._weight);
-			memIdx.printCells();
-			diskIdx.printCells();
-			memIdx.listObjectsInCell(memIdx._maxPosition.locateCell(Config._a, Config._b));
+			//memIdx.printCells();
+			//diskIdx.printCells();
+			//memIdx.listObjectsInCell(memIdx._maxPosition.locateCell(Config._a, Config._b));
 			System.out.println("memory cost: "+memIdx.size);
 		}
 	}

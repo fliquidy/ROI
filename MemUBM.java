@@ -81,10 +81,6 @@ public class MemUBM {
         maxUBM.updateUBforCell(c, o, ot);
         minUBM.updateUBforCell(c, o, ot);
     }
-    public void replaceCell(Cell c, UpperBound ub){
-        maxUBM.replaceCell(c, ub);
-        minUBM.replaceCell(c, ub);
-    }
     public void remove(Cell c){
         maxUBM.remove(c);
         minUBM.remove(c);
@@ -98,9 +94,9 @@ public class MemUBM {
         minUBM.getUB(c).setPoint(p._x, p._y);
     }
     public int size(){
-        if(maxUBM.size() != minUBM.size()){
-            System.err.println("maxUBM and minUBM don't match.");
-        }
+        //if(maxUBM.size() != minUBM.size()){
+        //    System.err.println("maxUBM and minUBM don't match.");
+        //}
         return maxUBM.size();
     }
     public double getUBValue(Cell c){

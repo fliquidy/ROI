@@ -21,14 +21,29 @@ public class DiskIndex {
     public static String _cellObjName = "cell_list";
 
     public DiskIndex(){
-        //_db = DBMaker.newFileDB(new File(_dbName)).closeOnJvmShutdown().cacheDisable().make();
-        _db = DBMaker.newMemoryDB().make();
+        clean();
+        _db = DBMaker.newFileDB(new File(_dbName)).closeOnJvmShutdown().cacheDisable().make();
+        //_db = DBMaker.newMemoryDB().make();
         _cacheObj = new HashMap<Cell, LinkedList<SpatialObject>>();
         _ubm = new UpperboundManager();
         _ubm.isMaxHeap = true;
         _time = new HashMap<Cell, Integer>();
         _cellObjMap = _db.createTreeMap(_cellObjName).makeOrGet();
         _cacheSize = 0;
+    }
+    public void clean(){
+        File f1 = new File(_dbName);
+        if(f1.exists()){
+            f1.delete();
+        }
+        File f2 = new File(_dbName+".t");
+        if(f2.exists()){
+            f2.delete();
+        }
+        File f3 = new File(_dbName+".p");
+        if(f3.exists()){
+            f3.delete();
+        }
     }
     public boolean containCell(Cell c){
         return _ubm.containCell(c);
@@ -69,8 +84,6 @@ public class DiskIndex {
         _cacheObj.clear();
         _db.commit();
         _cacheSize = 0;
-        Cell cc = new Cell(1, -6);
-        LinkedList<SpatialObject> l = getList(cc);
     }
 
 
