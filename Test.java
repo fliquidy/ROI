@@ -17,7 +17,7 @@ public class Test {
             while((line = bfr.readLine()) != null){
 				String[] split = line.split("\\s+");
                 System.out.println(cnt+": processing: "+line);
-				if(cnt == 32){
+				if(cnt == 292){
 					System.out.println();
 				}
                 cnt ++;

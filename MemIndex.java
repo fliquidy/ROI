@@ -47,15 +47,21 @@ public class  MemIndex {
             bi.insertInterval(current, current.y + 1.0);
         }
         System.out.println("maxScore: "+bi.maxScore);
-        Point p = new Point(bi.maxX, bi.maxY, bi.maxScore);
-        if((!_isValid) || (bi.maxScore > _maxPosition._weight)){
-            _maxPosition._weight = bi.maxScore;
-            _maxPosition._x = bi.maxX;
-            _maxPosition._y = bi.maxY;
+        Point p = null;
+        if(bi.found){
+            p = new Point(bi.maxX, bi.maxY, bi.maxScore);
+        }
+        else{
+            p = new Point(Config._b * (c._x+0.5), Config._a * (c._y + 0.5), 0);
+        }
+        if((!_isValid) || (bi.maxScore >= _maxPosition._weight)){
+            _maxPosition._weight = p._weight;
+            _maxPosition._x = p._x;
+            _maxPosition._y = p._y;
             _updatedResult = true;
             _isValid = true;
         }
-        _ubm.setExactBound(c, bi.maxScore);
+        _ubm.setExactBound(c, p._weight);
         _ubm.setPoint(c, p);
         checkObjects(c, p);
         System.out.println(_ubm.getUB(c)._coldBound+" "+_ubm.getUB(c)._hotBound);
@@ -166,13 +172,10 @@ public class  MemIndex {
             default:
                 break;
         }
-        Cell c1 = o.locateCell(Config._a, Config._b);
-        Cell c2 = _maxPosition.locateCell(Config._a, Config._b);
         if(_maxPosition != null &&
                 c.equals(_maxPosition.locateCell(Config._a, Config._b))){
             _isValid = false;
         }
-        check(c);
         return size >= Config._memoryConstraint;
     }
     public void removeFromMemory(Cell c){
